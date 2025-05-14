@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  private baseUrl = 'http://192.168.1.103:3000';
+  private baseUrl = 'http://localhost:3000';
 
   private studentName: string = '';
   private questions: any[] = [];
