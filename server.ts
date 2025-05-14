@@ -5,26 +5,30 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import AppServerModule from './src/main.server';
 
+
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
   const server = express();
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
   const indexHtml = join(serverDistFolder, 'index.server.html');
+  const jsonServer = require('json-server');
 
   const commonEngine = new CommonEngine();
 
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // Example Express Rest API endpoints
-  // server.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
-  server.get('*.*', express.static(browserDistFolder, {
-    maxAge: '1y'
-  }));
+  // ✅ JSON Server Setup
+  const apiRouter = jsonServer.router(join(serverDistFolder, 'db.json'));
+  const apiMiddlewares = jsonServer.defaults();
+  server.use('/api', apiMiddlewares);
+  server.use('/api', apiRouter);
 
-  // All regular routes use the Angular engine
+  // Static files
+  server.get('*.*', express.static(browserDistFolder, { maxAge: '1y' }));
+
+  // Angular SSR routes
   server.get('*', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
 
@@ -45,11 +49,10 @@ export function app(): express.Express {
 
 function run(): void {
   const port = process.env['PORT'] || 4000;
-
-  // Start up the Node server
   const server = app();
   server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    console.log(`✅ Node Express server listening on http://localhost:${port}`);
+    console.log(`✅ JSON Server available at http://localhost:${port}/api`);
   });
 }
 
