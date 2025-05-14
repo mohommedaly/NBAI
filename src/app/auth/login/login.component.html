@@ -1,0 +1,26 @@
+<div class="min-h-screen flex items-center justify-center bg-[#0F1020] text-[#39FF14] font-['Tomorrow']">
+  <div class="w-[300px] flex flex-col items-end mt-10">
+    <h2 class="text-3xl font-semibold text-center w-full mb-10">Student Login</h2>
+
+    <!-- Input -->
+    <div class="w-full mb-6 relative">
+      <label class="absolute top-[-10px] left-4 text-[10px] uppercase tracking-widest bg-[#39FF14] text-[#0F1020] px-3 py-0.5 rounded">
+        Enter your name
+      </label>
+      <input
+        type="text"
+        [(ngModel)]="studentName"
+        placeholder="e.g. Neo"
+        class="w-full bg-[#0F1020] border-2 border-[#39FF14] text-[#39FF14] px-4 py-3 mt-2 text-sm rounded outline-none focus:border-[#00FF00] transition-all duration-200"
+      />
+    </div>
+
+    <!-- Button -->
+    <button
+      (click)="startExam()"
+      class="w-full bg-[#39FF14] hover:bg-[#00FF00] text-[#0F1020] py-3 rounded transition-all duration-300 font-semibold tracking-widest text-sm uppercase"
+    >
+      Start Exam
+    </button>
+  </div>
+</div>
