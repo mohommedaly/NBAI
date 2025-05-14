@@ -977,6 +977,114 @@
           "correct": "Ensures the field must be filled before submission"
         }
       ]
+    },
+    {
+      "id": "1d97",
+      "studentName": "kaif",
+      "score": 5,
+      "total": 20,
+      "answers": [
+        {
+          "question": "What does HTML stand for?",
+          "selected": "HyperText and Links Markup Language",
+          "correct": "HyperText Markup Language"
+        },
+        {
+          "question": "Which tag is used to create a hyperlink?",
+          "selected": "<a>",
+          "correct": "<a>"
+        },
+        {
+          "question": "What attribute is used to specify the link destination in an <a> tag?",
+          "selected": "alt",
+          "correct": "href"
+        },
+        {
+          "question": "What does the <img> tag require to display an image properly?",
+          "selected": "src",
+          "correct": "src"
+        },
+        {
+          "question": "Which tag defines the main content of an HTML document?",
+          "selected": "<title>",
+          "correct": "<body>"
+        },
+        {
+          "question": "Which tag is used for the largest heading?",
+          "selected": "<head>",
+          "correct": "<h1>"
+        },
+        {
+          "question": "How do you insert a comment in HTML?",
+          "selected": "// This is a comment",
+          "correct": "<!-- This is a comment -->"
+        },
+        {
+          "question": "Which tag is used to make text italic?",
+          "selected": "<i>",
+          "correct": "<i>"
+        },
+        {
+          "question": "What does the <strong> tag indicate?",
+          "selected": "Underlined text",
+          "correct": "Important (bold) text"
+        },
+        {
+          "question": "Which HTML tag is used to create a list with bullet points?",
+          "selected": "<ol>",
+          "correct": "<ul>"
+        },
+        {
+          "question": "What is the correct HTML tag for a numbered list?",
+          "selected": "<dl>",
+          "correct": "<ol>"
+        },
+        {
+          "question": "Which tag is used to create a table row?",
+          "selected": "<tr>",
+          "correct": "<tr>"
+        },
+        {
+          "question": "Which attribute is used to merge two or more columns in a table?",
+          "selected": "merge",
+          "correct": "colspan"
+        },
+        {
+          "question": "What is the purpose of the <th> tag in HTML tables?",
+          "selected": "Table hyperlink",
+          "correct": "Table header"
+        },
+        {
+          "question": "What is the role of <div> in HTML layout?",
+          "selected": "Style text",
+          "correct": "Sectional block container"
+        },
+        {
+          "question": "Which tag is used for inline styling or layout grouping?",
+          "selected": "<div>",
+          "correct": "<span>"
+        },
+        {
+          "question": "Which tag is used to create a form in HTML?",
+          "selected": "<form>",
+          "correct": "<form>"
+        },
+        {
+          "question": "Which attribute of <form> specifies where to send form data?",
+          "selected": "href",
+          "correct": "action"
+        },
+        {
+          "question": "Which input type is used for password fields?",
+          "selected": "email",
+          "correct": "password"
+        },
+        {
+          "question": "What does the required attribute do in an input field?",
+          "selected": "Highlights field",
+          "correct": "Ensures the field must be filled before submission"
+        }
+      ]
     }
   ]
 }
