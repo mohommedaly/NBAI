@@ -14,7 +14,7 @@ export class ExamComponent implements OnInit {
   studentName = '';
   submitted = false;
 
-  countdown = 20;
+  countdown = 60;
   timer: any;
 
   constructor(private router: Router, private api: ApiService) {}
@@ -33,7 +33,7 @@ export class ExamComponent implements OnInit {
   }
 
   startTimer(): void {
-    this.countdown = 20;
+    this.countdown = 60;
 
     this.timer = setInterval(() => {
       this.countdown--;
