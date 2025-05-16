@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  private baseUrl = 'http://https://json-server-db-exam.onrender.com';
+  private baseUrl = 'http://json-server-db-exam.onrender.com';
 
   private studentName: string = '';
   private questions: any[] = [];
