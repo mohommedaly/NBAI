@@ -7,13 +7,23 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  private baseUrl = 'https://json-server-db-exam.onrender.com';
+  private baseUrl = 'http://https://json-server-db-exam.onrender.com:3000';
 
   private studentName: string = '';
   private questions: any[] = [];
   private score: number = 0;
-
+  private selectedSubject: any;
   constructor(private http: HttpClient) {}
+
+
+
+setSelectedSubject(subject: any) {
+  this.selectedSubject = subject;
+}
+
+getSelectedSubject(): any {
+  return this.selectedSubject;
+}
 
   // 🔹 Store student name after login
   setStudentName(name: string) {
@@ -49,8 +59,27 @@ export class ApiService {
     };
   }
 
-  // 🔹 For admin: Get all submitted results
+  // 🔹 For admin:
   getAllResults(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/results`);
+    
   }
+
+
+  addSubject(subject: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/subjects`, subject);  // Correct URL here
+  }
+
+  getSubjects(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/subjects`);  // Corrected the URL
+  }
+  // 🔹 Add Question
+  addQuestion(question: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/questions`, question);  // URL for questions
+  }
+  getQuestionsBySubject(subjectId: string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/questions?subjectId=${subjectId}`);
+}
+
+
 }

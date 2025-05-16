@@ -1,0 +1,41 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+  <!-- <button class="bg-primary text-white py-3 px-4 rounded-lg shadow hover:bg-opacity-90 flex items-center gap-2">
+    <i class="fas fa-plus"></i> Create Exam
+  </button> -->
+
+<!-- Create Subject -->
+
+<button (click)="openForm()" class="bg-blue-600 text-white py-3 px-4 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2 mb-4">
+  <i class="fas fa-file-alt"></i> Create Subject
+</button>
+
+<!-- Form Modal -->
+<div *ngIf="showForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded p-6 w-full max-w-md relative shadow-lg">
+    <button (click)="closeForm()" class="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700">&times;</button>
+    
+    <h2 class="text-xl font-semibold mb-4">Create Subject</h2>
+    <form [formGroup]="subjectForm" (ngSubmit)="submitForm()">
+      
+      <label class="block mb-1 font-medium">Subject Name</label>
+      <input formControlName="subjectName" type="text" class="w-full mb-3 p-2 border rounded" placeholder="e.g. Mathematics">
+      
+      <label class="block mb-1 font-medium">Subject Code</label>
+      <input formControlName="subjectCode" type="text" class="w-full mb-3 p-2 border rounded" placeholder="e.g. MATH101">
+      
+      <button type="submit" [disabled]="subjectForm.invalid" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Submit</button>
+    </form>
+  </div>
+</div>
+
+   <button class="bg-green-600 text-white py-3 px-4 rounded-lg shadow hover:bg-green-700 flex items-center gap-2">
+    <i class="fas fa-calendar-alt"></i> Schedule Exam
+  </button>
+  <!-- <button class="bg-yellow-500 text-white py-3 px-4 rounded-lg shadow hover:bg-yellow-600 flex items-center gap-2">
+    <i class="fas fa-question-circle"></i> Manage Questions
+  </button> -->
+  <button class="bg-purple-600 text-white py-3 px-4 rounded-lg shadow hover:bg-purple-700 flex items-center gap-2">
+    <i class="fas fa-chart-bar"></i> View Results
+  </button>
+
+</div>

@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ResultComponent } from './result/result.component';
 import { LoginComponent } from './auth/login/login.component';
+import { HugeiconsIconComponent } from '@hugeicons/angular';
 
 
 @NgModule({
@@ -24,7 +25,9 @@ import { LoginComponent } from './auth/login/login.component';
     AppRoutingModule,
     RouterModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    HugeiconsIconComponent,
+   
   ],
   providers: [
     provideClientHydration()

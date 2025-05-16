@@ -1,0 +1,7 @@
+<app-nav-mexam></app-nav-mexam>
+
+<!-- M-Cards Component: When a subject is selected, emit the event -->
+<app-m-cards (subjectSelected)="onSubjectSelected($event)"></app-m-cards>
+
+<!-- Only show this component if a subject is selected -->
+<app-manage-que *ngIf="selectedSubject" [subject]="selectedSubject"></app-manage-que>

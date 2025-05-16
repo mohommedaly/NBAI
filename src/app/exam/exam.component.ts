@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../api.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-exam',
@@ -17,7 +17,11 @@ export class ExamComponent implements OnInit {
   countdown = 60;
   timer: any;
 
-  constructor(private router: Router, private api: ApiService) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private api: ApiService
+  ) {}
 
   ngOnInit(): void {
     this.studentName = this.api.getStudentName();
@@ -26,15 +30,25 @@ export class ExamComponent implements OnInit {
       return;
     }
 
-    this.api.loadQuestions().subscribe(data => {
-      this.questions = data.map((q: any) => ({ ...q, selectedAnswer: '' }));
-      this.startTimer(); // Start first question's timer
+    // Get selected subjectId from query params
+    this.route.queryParams.subscribe(params => {
+      const subjectId = params['subjectId'];
+
+      if (!subjectId) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      // Fetch only questions of that subject
+      this.api.getQuestionsBySubject(subjectId).subscribe(data => {
+        this.questions = data.map((q: any) => ({ ...q, selectedAnswer: '' }));
+        this.startTimer();
+      });
     });
   }
 
   startTimer(): void {
     this.countdown = 60;
-
     this.timer = setInterval(() => {
       this.countdown--;
       if (this.countdown === 0) {
@@ -45,12 +59,11 @@ export class ExamComponent implements OnInit {
 
   selectAnswer(option: string): void {
     this.questions[this.currentQuestionIndex].selectedAnswer = option;
-    this.nextQuestion(); // Auto-next on selection
+    this.nextQuestion();
   }
 
   nextQuestion(): void {
     clearInterval(this.timer);
-
     if (this.currentQuestionIndex < this.questions.length - 1) {
       this.currentQuestionIndex++;
       this.startTimer();
@@ -61,7 +74,6 @@ export class ExamComponent implements OnInit {
 
   submitExam(): void {
     clearInterval(this.timer);
-
     this.score = this.questions.filter(q => q.selectedAnswer === q.correctAnswer).length;
 
     const result = {

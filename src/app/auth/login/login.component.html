@@ -2,8 +2,8 @@
   <div class="w-[300px] flex flex-col items-end mt-10">
     <h2 class="text-3xl font-semibold text-center w-full mb-10">Student Login</h2>
 
-    <!-- Input -->
-    <div class="w-full mb-6 relative">
+    <!-- Student Name -->
+    <div class="w-full mb-4 relative">
       <label class="absolute top-[-10px] left-4 text-[10px] uppercase tracking-widest bg-[#39FF14] text-[#0F1020] px-3 py-0.5 rounded">
         Enter your name
       </label>
@@ -15,10 +15,26 @@
       />
     </div>
 
-    <!-- Button -->
+    <!-- Subject Dropdown -->
+    <div class="w-full mb-6">
+      <label class="block mb-1 text-sm">Choose Subject</label>
+      <select
+        [(ngModel)]="selectedSubject"
+        class="w-full bg-[#0F1020] border-2 border-[#39FF14] text-[#39FF14] px-4 py-3 text-sm rounded"
+        [ngModelOptions]="{ standalone: true }"
+      >
+        <option [ngValue]="null" disabled selected>Select Subject</option>
+        <option *ngFor="let subject of subjects" [ngValue]="subject">
+          {{ subject.subjectName }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Start Button -->
     <button
       (click)="startExam()"
       class="w-full bg-[#39FF14] hover:bg-[#00FF00] text-[#0F1020] py-3 rounded transition-all duration-300 font-semibold tracking-widest text-sm uppercase"
+      [disabled]="!studentName || !selectedSubject"
     >
       Start Exam
     </button>

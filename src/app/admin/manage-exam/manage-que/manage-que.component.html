@@ -1,0 +1,77 @@
+<section class="bg-white p-6 rounded shadow mb-10">
+  <h2 class="text-xl font-semibold mb-4">Question Management - {{ subject.subjectName }}</h2>
+
+  <form class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" (ngSubmit)="addQuestion()">
+    <input type="text" placeholder="Question Text" class="border p-2 rounded"
+           [(ngModel)]="questionText" name="text" required />
+
+    <select class="border p-2 rounded" [(ngModel)]="questionType" name="type" required>
+      <option disabled value="">Type</option>
+      <option>MCQ</option>
+      <option>True/False</option>
+      <option>Short</option>
+      <option>Long</option>
+    </select>
+
+    <select class="border p-2 rounded" [(ngModel)]="difficulty" name="difficulty" required>
+      <option disabled value="">Difficulty</option>
+      <option>Easy</option>
+      <option>Medium</option>
+      <option>Hard</option>
+    </select>
+
+    <div *ngIf="questionType === 'MCQ'">
+      <div class="mb-2">
+        <label>Option 1:</label>
+        <input type="text" class="border p-2 rounded" [(ngModel)]="options[0]" name="option1" required />
+      </div>
+      <div class="mb-2">
+        <label>Option 2:</label>
+        <input type="text" class="border p-2 rounded" [(ngModel)]="options[1]" name="option2" required />
+      </div>
+      <div class="mb-2">
+        <label>Option 3:</label>
+        <input type="text" class="border p-2 rounded" [(ngModel)]="options[2]" name="option3" required />
+      </div>
+      <div class="mb-2">
+        <label>Option 4:</label>
+        <input type="text" class="border p-2 rounded" [(ngModel)]="options[3]" name="option4" required />
+      </div>
+    </div>
+
+    <input type="text" placeholder="Correct Answer" class="border p-2 rounded"
+           [(ngModel)]="correctAnswer" name="answer" required />
+
+    <div class="flex gap-4 mt-2 md:col-span-2">
+      <button type="submit"
+              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        Add Question
+      </button>
+    </div>
+  </form>
+
+  <div class="overflow-x-auto">
+    <h3 class="font-semibold mb-2">Preview Added Questions</h3>
+    <table class="min-w-full text-sm border" *ngIf="currentQuestions.length > 0; else noQuestions">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="p-2 border">Question</th>
+          <th class="p-2 border">Type</th>
+          <th class="p-2 border">Difficulty</th>
+          <th class="p-2 border">Answer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let q of currentQuestions">
+          <td class="p-2 border">{{ q.questionText }}</td>
+          <td class="p-2 border">{{ q.type }}</td>
+          <td class="p-2 border">{{ q.difficulty }}</td>
+          <td class="p-2 border">{{ q.correctAnswer }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noQuestions>
+      <p class="text-gray-500">No questions added for this subject yet.</p>
+    </ng-template>
+  </div>
+</section>
