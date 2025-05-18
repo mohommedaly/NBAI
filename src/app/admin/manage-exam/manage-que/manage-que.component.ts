@@ -2,17 +2,16 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ApiService } from '../../../api.service';  // Import the ApiService
 
 interface Question {
-  id?: string;
+  id: string;  // No more optional id, we assume it's always available
   questionText: string;
   options: string[];  // Array to store multiple options
   correctAnswer: string;  // Correct answer selected by the user
   type: string;
   difficulty: string;
   subjectId: string;  // To associate the question with a subject
-  text:any;
-  answer:any;
+  text: any;
+  answer: any;
 }
-
 
 @Component({
   selector: 'app-manage-que',
@@ -29,6 +28,8 @@ export class ManageQueComponent implements OnChanges {
   correctAnswer = '';
   options: string[] = ['', '', '', ''];  // Array to store 4 options
   currentQuestions: Question[] = [];
+  showDeleteConfirm = false;
+  questionToDelete!: Question;  // Question is always defined now
 
   constructor(private api: ApiService) {}
 
@@ -39,12 +40,11 @@ export class ManageQueComponent implements OnChanges {
     }
   }
 
-  // Load questions for the selected subject
   loadQuestionsForSubject() {
     if (this.subject?.id) {
       this.api.getQuestionsBySubject(this.subject.id).subscribe(
         (questions: Question[]) => {
-          this.currentQuestions = questions;
+          this.currentQuestions = questions ?? [];  // Fallback to empty array if null
           console.log('Fetched questions for subject:', this.currentQuestions);
         },
         (error: any) => {
@@ -66,14 +66,13 @@ export class ManageQueComponent implements OnChanges {
       difficulty: this.difficulty,
       subjectId: this.subject.id,
       text: '',
-      answer: ''
+      answer: '',
+      id: ''
     };
 
-    // Call the service to post the question
     this.api.addQuestion(question).subscribe(
       (response: any) => {
         console.log('Question added successfully:', response);
-        // Reload questions to show the newly added question
         this.loadQuestionsForSubject();
         this.resetForm();
       },
@@ -90,6 +89,34 @@ export class ManageQueComponent implements OnChanges {
     this.correctAnswer = '';
     this.options = ['', '', '', ''];  // Reset options
   }
+
+  // Open delete confirmation dialog
+  openDeleteConfirmDialog(question: Question) {
+    this.questionToDelete = question;
+    this.showDeleteConfirm = true;
+  }
+
+  // Cancel delete
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.questionToDelete ;
+  }
+
+  // Confirm delete
+  confirmDelete() {
+    if (this.questionToDelete) {  // No null check anymore, questionToDelete is always defined
+      this.api.deleteQuestion(this.questionToDelete.id).subscribe(
+        () => {
+          // Remove the question from the list after successful deletion
+          this.currentQuestions = this.currentQuestions.filter(q => q.id !== this.questionToDelete.id);
+          this.showDeleteConfirm = false;
+          this.questionToDelete ;  // After deletion, set to null
+        },
+        (error) => {
+          console.error('Error deleting question:', error);
+          this.showDeleteConfirm = false;
+        }
+      );
+    }
+  }
 }
-
-

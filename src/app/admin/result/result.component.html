@@ -6,16 +6,22 @@
       <tr class="bg-gray-100">
         <th class="p-2">#</th>
         <th class="p-2">Student</th>
+        <th class="p-2">Subject</th>
         <th class="p-2">Score</th>
         <th class="p-2">Out of</th>
+        <th class="p-2 " style="background-color: red;">action</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let result of results; let i = index" class="border-t">
         <td class="p-2">{{ i + 1 }}</td>
         <td class="p-2">{{ result.studentName }}</td>
+        <td class="p-2">{{ getSubjectName(result.subjectId) }}</td>  <!-- Display Subject Name -->
         <td class="p-2">{{ result.score }}</td>
         <td class="p-2">{{ result.total }}</td>
+          <td style="color: brown;">
+        <button (click)="deleteResult(result.id)">Delete</button>
+      </td>
       </tr>
     </tbody>
   </table>

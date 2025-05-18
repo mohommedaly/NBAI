@@ -17,6 +17,9 @@ export class ExamComponent implements OnInit {
   countdown = 60;
   timer: any;
 
+  subjectId = '';
+  subName = '';
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -30,17 +33,18 @@ export class ExamComponent implements OnInit {
       return;
     }
 
-    // Get selected subjectId from query params
+    // Get selected subjectId and subName from query params
     this.route.queryParams.subscribe(params => {
-      const subjectId = params['subjectId'];
+      this.subjectId = params['subjectId'];
+      this.subName = params['subName'];  // Optional, if available
 
-      if (!subjectId) {
+      if (!this.subjectId) {
         this.router.navigate(['/login']);
         return;
       }
 
       // Fetch only questions of that subject
-      this.api.getQuestionsBySubject(subjectId).subscribe(data => {
+      this.api.getQuestionsBySubject(this.subjectId).subscribe(data => {
         this.questions = data.map((q: any) => ({ ...q, selectedAnswer: '' }));
         this.startTimer();
       });
@@ -78,6 +82,8 @@ export class ExamComponent implements OnInit {
 
     const result = {
       studentName: this.studentName,
+      subjectId: this.subjectId,
+      subName: this.subName,
       score: this.score,
       total: this.questions.length,
       answers: this.questions.map(q => ({

@@ -7,7 +7,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { NavAdminComponent } from './nav-admin/nav-admin.component';
 import { CardsDashboardComponent } from './admin-dashboard/cards-dashboard/cards-dashboard.component';
 import { ManageExamComponent } from './manage-exam/manage-exam.component';
-import { NavMexamComponent } from './manage-exam/nav-mexam/nav-mexam.component';
+
 import { MCardsComponent } from './manage-exam/m-cards/m-cards.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ManageQueComponent } from './manage-exam/manage-que/manage-que.component';
@@ -19,7 +19,7 @@ import { ManageQueComponent } from './manage-exam/manage-que/manage-que.componen
     NavAdminComponent,
     CardsDashboardComponent,
     ManageExamComponent,
-    NavMexamComponent,
+   
     MCardsComponent,
     ManageQueComponent
   ],

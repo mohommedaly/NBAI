@@ -50,8 +50,9 @@
     </div>
   </form>
 
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto mt-4">
     <h3 class="font-semibold mb-2">Preview Added Questions</h3>
+
     <table class="min-w-full text-sm border" *ngIf="currentQuestions.length > 0; else noQuestions">
       <thead>
         <tr class="bg-gray-100">
@@ -59,6 +60,7 @@
           <th class="p-2 border">Type</th>
           <th class="p-2 border">Difficulty</th>
           <th class="p-2 border">Answer</th>
+          <th class="p-2 border">Actions</th> <!-- New column for delete -->
         </tr>
       </thead>
       <tbody>
@@ -67,11 +69,39 @@
           <td class="p-2 border">{{ q.type }}</td>
           <td class="p-2 border">{{ q.difficulty }}</td>
           <td class="p-2 border">{{ q.correctAnswer }}</td>
+          <td class="p-2 border text-center">
+            <button (click)="openDeleteConfirmDialog(q)" class="text-red-600 hover:text-red-800">
+              Delete
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
+
     <ng-template #noQuestions>
       <p class="text-gray-500">No questions added for this subject yet.</p>
     </ng-template>
   </div>
+
+  <!-- ✅ Confirmation Modal -->
+  <div *ngIf="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded shadow-lg p-6 w-80 text-center">
+      <h3 class="text-lg font-semibold mb-4">
+        <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+        Delete question?
+      </h3>
+      <p class="text-gray-600 mb-6">This action cannot be undone.</p>
+      <div class="flex justify-center gap-4">
+        <button (click)="cancelDelete()"
+                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
+          Cancel
+        </button>
+        <button (click)="confirmDelete()"
+                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
 </section>

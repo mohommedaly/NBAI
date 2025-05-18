@@ -1,12 +1,149 @@
-<section class="bg-white p-6 rounded shadow mb-10">
-  <h2 class="text-xl font-semibold mb-4">Created Subjects</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-    <!-- Loop through the subjects array and emit event on card click -->
-    <div *ngFor="let subject of subjects" 
-         class="border border-gray-200 rounded p-4 shadow hover:shadow-md transition cursor-pointer"
-         (click)="onSubjectClick(subject)"> <!-- On click emit subject -->
-      <h3 class="text-lg font-semibold mb-1">{{ subject.subjectName }}</h3>
-      <p class="text-sm text-gray-600">Subject Code: {{ subject.subjectCode }}</p>
+<header class="bg-primary text-white p-4 mb-4 flex justify-between items-center">  
+  <h2 class="text-xl font-semibold ">Manage Exam</h2>
+</header>
+
+<div class="top-[110px] right-6 flex gap-4 z-index max-w-full">
+  <button (click)="openForm()"
+    class="bg-primary hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow flex items-center gap-2">
+    <i class="fas fa-plus-circle"></i> Create Subject
+  </button>
+
+  <button (click)="toggleDeleteIcons()"
+    class="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded shadow flex items-center gap-2">
+    <i class="fas fa-trash-alt"></i> Toggle Delete
+  </button>
+</div>
+
+<!-- 📌 Subject Cards -->
+<section class="bg-white p-6 mt-[25px] rounded shadow">
+  <!-- If No Subjects Exist -->
+  <div *ngIf="subjects.length === 0" class="text-center text-gray-600 py-10">
+    <div class="text-6xl mb-4 text-primary">
+      <i class="fas fa-book-open"></i>
+    </div>
+    <p class="text-lg font-medium mb-2">No subjects found</p>
+    <p class="text-sm mb-4">Start by creating a new subject to manage its exams.</p>
+    <button (click)="openForm()"
+      class="bg-primary hover:bg-opacity-90 text-white px-5 py-2 rounded shadow inline-flex items-center gap-2">
+      <i class="fas fa-plus-circle"></i> Add Subject
+    </button>
+  </div>
+
+  <!-- If Subjects Exist -->
+  <div *ngIf="subjects.length > 0" class="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div *ngFor="let subject of subjects"
+      class="relative bg-gray-50 border border-gray-200 rounded-lg p-5 shadow hover:shadow-md transition">
+
+      <button *ngIf="showDeleteIcons"
+        class="absolute top-3 right-3 text-red-600 hover:text-red-800"
+        (click)="openConfirmDialog(subject); $event.stopPropagation()">
+        <i class="fas fa-times-circle text-xl"></i>
+      </button>
+
+      <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ subject.subjectName }}</h3>
+      <p class="text-sm text-gray-600 mb-2">Code: {{ subject.subjectCode }}</p>
+
+      <div *ngIf="subject.examDate" class="text-sm text-green-700 space-y-1 mb-2">
+        <div><i class="fas fa-calendar-alt mr-1"></i> {{ subject.examDate }}</div>
+        <div><i class="fas fa-clock mr-1"></i> {{ subject.examTime }}</div>
+        <div><i class="fas fa-hourglass-half mr-1"></i> {{ subject.duration }} mins</div>
+      </div>
+
+      <button (click)="openScheduleModal(subject)"
+        class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded text-sm mt-2">
+        <i class="fas fa-calendar-alt mr-1"></i> Schedule Exam
+      </button>
+
+      <!-- Manage Questions Button -->
+      <button (click)="selectSubject(subject)"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm mt-2">
+        <i class="fas fa-edit mr-1"></i> Manage Questions
+      </button>
     </div>
   </div>
 </section>
+
+<!-- Manage Que Component -->
+<app-manage-que *ngIf="selectedSubject" [subject]="selectedSubject"></app-manage-que>
+
+<!-- 🧾 Create Subject Modal -->
+<div *ngIf="showForm" class="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center px-4">
+  <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative">
+    <button (click)="closeForm()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <h2 class="text-xl font-semibold mb-4 text-center">Create New Subject</h2>
+
+    <form [formGroup]="subjectForm" (ngSubmit)="submitForm()" class="space-y-4">
+      <div>
+        <label class="block mb-1 font-medium">Subject Name</label>
+        <input formControlName="subjectName" type="text" placeholder="e.g. Chemistry"
+          class="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label class="block mb-1 font-medium">Subject Code</label>
+        <input formControlName="subjectCode" type="text" placeholder="e.g. CHEM101"
+          class="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div class="text-center">
+        <button type="submit" [disabled]="subjectForm.invalid"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded shadow">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ❓ Confirm Delete Modal -->
+<div *ngIf="showConfirmDialog" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-4">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center relative">
+    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+      <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+      Delete Subject?
+    </h3>
+    <p class="text-gray-600 mb-6">{{ subjectToDelete?.subjectName }}</p>
+    <div class="flex justify-center gap-4">
+      <button (click)="cancelDelete()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+        Cancel
+      </button>
+      <button (click)="confirmDelete()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 📆 Schedule Exam Modal -->
+<div *ngIf="showScheduleModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-4">
+  <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative">
+    <button (click)="closeScheduleModal()" class="absolute top-2 right-3 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <h2 class="text-xl font-semibold mb-4 text-center">Schedule Exam for {{ selectedSubject?.subjectName }}</h2>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block mb-1 font-medium">Exam Date</label>
+        <input type="date" [(ngModel)]="examDate"
+          class="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-green-500">
+      </div>
+
+      <div>
+        <label class="block mb-1 font-medium">Exam Time</label>
+        <input type="time" [(ngModel)]="examTime"
+          class="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-green-500">
+      </div>
+
+      <div>
+        <label class="block mb-1 font-medium">Duration (minutes)</label>
+        <input type="number" [(ngModel)]="examDuration" min="1"
+          class="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-green-500">
+      </div>
+
+      <div class="text-center pt-2">
+        <button (click)="saveSchedule()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded shadow">
+          Save Schedule
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -23,16 +23,22 @@ export class LoginComponent implements OnInit {
   }
 
   startExam() {
-    if (this.studentName.trim() && this.selectedSubject) {
-      this.api.setStudentName(this.studentName);
+  if (this.studentName.trim() && this.selectedSubject) {
+    // Store student name
+    this.api.setStudentName(this.studentName);
 
-      // Optional: Store selected subject if needed elsewhere
-      this.api.setSelectedSubject(this.selectedSubject);
+    // Store the selected subject
+    this.api.setSelectedSubject(this.selectedSubject);
 
-      // Navigate to exam page
-      this.router.navigate(['/exm'], {
-        queryParams: { subjectId: this.selectedSubject.id }
-      });
-    }
+    // You can also directly store the subjectId if needed
+    const subjectId = this.selectedSubject.id;
+    this.api.setSelectedSubject(subjectId);  // Store the subjectId
+
+    // Navigate to the exam page
+    this.router.navigate(['/exm'], {
+      queryParams: { subjectId: subjectId }
+    });
   }
+}
+
 }

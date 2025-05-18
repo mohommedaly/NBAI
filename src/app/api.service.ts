@@ -16,10 +16,14 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
 
+  deleteSubject(id: number) {
+    return this.http.delete(`${this.baseUrl}/subjects/${id}`);
+  }
 
-setSelectedSubject(subject: any) {
-  this.selectedSubject = subject;
-}
+  setSelectedSubject(subject: any): void {
+    this.selectedSubject = subject;
+    this.selectedSubject = subject.id;  // Store subjectId
+  }
 
 getSelectedSubject(): any {
   return this.selectedSubject;
@@ -43,6 +47,10 @@ getSelectedSubject(): any {
   submitResult(result: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/results`, result);
   }
+
+  deleteResult(id: string): Observable<any> {
+  return this.http.delete(`${this.baseUrl}/results/${id}`);
+}
 
   // 🔹 Save result locally to use in ResultComponent
   setResult(questions: any[], score: number) {
@@ -69,6 +77,9 @@ getSelectedSubject(): any {
   addSubject(subject: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/subjects`, subject);  // Correct URL here
   }
+updateSubject(id: string, subject: any): Observable<any> {
+  return this.http.put(`${this.baseUrl}/subjects/${id}`, subject);
+}
 
   getSubjects(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/subjects`);  // Corrected the URL
@@ -81,5 +92,8 @@ getSelectedSubject(): any {
   return this.http.get<any[]>(`${this.baseUrl}/questions?subjectId=${subjectId}`);
 }
 
+deleteQuestion(id: string) {
+  return this.http.delete(`${this.baseUrl}/questions/${id}`);
+}
 
 }
