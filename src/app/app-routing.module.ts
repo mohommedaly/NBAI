@@ -12,7 +12,7 @@ path:'',component:LoginComponent
   },
  { path: 'exm', component: ExamComponent },
   { path: 'result', component: ResultComponent },
-  { path: 'admin', component:AdminComponent, loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule) }, // optional
+  { path: 'admin1', component:AdminComponent, loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule) }, // optional
 ];
 
 @NgModule({

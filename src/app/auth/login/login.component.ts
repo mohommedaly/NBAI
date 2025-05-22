@@ -8,6 +8,9 @@ import { ApiService } from '../../api.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+goToAdminLogin() {
+this.router.navigate(['/admin-login']);
+}
   studentName: string = '';
   subjects: any[] = [];
   selectedSubject: any;

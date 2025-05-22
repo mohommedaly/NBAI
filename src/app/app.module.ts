@@ -19,6 +19,7 @@ import { HugeiconsIconComponent } from '@hugeicons/angular';
     ExamComponent,
     ResultComponent,
     LoginComponent,
+
    
   ],
   imports: [
