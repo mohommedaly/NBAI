@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { LoadingService } from './loading.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'exam';
+  title = 'exam';constructor(public loadingService: LoadingService) {}
+
 }

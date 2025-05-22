@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
-
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { LoadingInterceptor } from './loading.interceptor'; // adjust path if needed
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ExamComponent } from './exam/exam.component';
@@ -30,7 +31,12 @@ import { HugeiconsIconComponent } from '@hugeicons/angular';
    
   ],
   providers: [
-    provideClientHydration()
+    provideClientHydration(),
+      {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoadingInterceptor,
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent]
 })
