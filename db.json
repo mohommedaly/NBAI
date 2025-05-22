@@ -1,45 +1,5 @@
 {
-  "subjects": [
-    {
-      "id": "41ed",
-      "subjectName": "angular",
-      "subjectCode": "12121",
-      "examDate": "2025-05-11",
-      "examTime": "19:14",
-      "duration": 60
-    }
-  ],
-  "questions": [
-    {
-      "id": "",
-      "questionText": "cxvxcvxcv",
-      "options": [
-        "yuguygu",
-        "uyguy",
-        "iuhui",
-        "ihgy"
-      ],
-      "correctAnswer": "iuhui",
-      "type": "MCQ",
-      "difficulty": "",
-      "subjectId": "41ed",
-      "text": "",
-      "answer": ""
-    }
-  ],
-  "results": [
-    {
-      "id": "cb86",
-      "studentName": "vbnvgbnbn",
-      "score": 1,
-      "total": 1,
-      "answers": [
-        {
-          "question": "cxvxcvxcv",
-          "selected": "iuhui",
-          "correct": "iuhui"
-        }
-      ]
-    }
-  ]
+  "subjects": [],
+  "questions": [],
+  "results": []
 }

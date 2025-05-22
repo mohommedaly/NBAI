@@ -33,17 +33,15 @@ export class ExamComponent implements OnInit {
       return;
     }
 
-    // Get selected subjectId and subName from query params
     this.route.queryParams.subscribe(params => {
       this.subjectId = params['subjectId'];
-      this.subName = params['subName'];  // Optional, if available
+      this.subName = params['subName'] || '';
 
       if (!this.subjectId) {
         this.router.navigate(['/login']);
         return;
       }
 
-      // Fetch only questions of that subject
       this.api.getQuestionsBySubject(this.subjectId).subscribe(data => {
         this.questions = data.map((q: any) => ({ ...q, selectedAnswer: '' }));
         this.startTimer();

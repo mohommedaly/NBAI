@@ -1,15 +1,15 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ApiService } from '../../../api.service';  // Import the ApiService
+import { ApiService } from '../../../api.service';
 
 interface Question {
-  id: string;  // No more optional id, we assume it's always available
+  id: string;
   questionText: string;
-  options: string[];  // Array to store multiple options
-  correctAnswer: string;  // Correct answer selected by the user
+  options: string[];
+  correctAnswer: string;
   type: string;
   difficulty: string;
-  subjectId: string;  // To associate the question with a subject
-  text: any;
+  subjectId: string;
+  text: any; // for code snippet
   answer: any;
 }
 
@@ -26,10 +26,16 @@ export class ManageQueComponent implements OnChanges {
   questionType = '';
   difficulty = '';
   correctAnswer = '';
-  options: string[] = ['', '', '', ''];  // Array to store 4 options
+  codeText = '';
+  options: string[] = ['', '', '', ''];
   currentQuestions: Question[] = [];
   showDeleteConfirm = false;
-  questionToDelete!: Question;  // Question is always defined now
+  questionToDelete!: Question;
+
+  // 👇 Bulk upload support
+  bulkText: string = '';
+  bulkFileError: string = '';
+  bulkFileName: string = '';
 
   constructor(private api: ApiService) {}
 
@@ -44,7 +50,7 @@ export class ManageQueComponent implements OnChanges {
     if (this.subject?.id) {
       this.api.getQuestionsBySubject(this.subject.id).subscribe(
         (questions: Question[]) => {
-          this.currentQuestions = questions ?? [];  // Fallback to empty array if null
+          this.currentQuestions = questions ?? [];
           console.log('Fetched questions for subject:', this.currentQuestions);
         },
         (error: any) => {
@@ -54,18 +60,17 @@ export class ManageQueComponent implements OnChanges {
     }
   }
 
-  // Add question with options
   addQuestion() {
     if (!this.subject?.id) return;
 
     const question: Question = {
       questionText: this.questionText,
-      options: this.options, // Array of options
+      options: this.options,
       correctAnswer: this.correctAnswer,
       type: this.questionType,
       difficulty: this.difficulty,
       subjectId: this.subject.id,
-      text: '',
+      text: this.codeText,
       answer: '',
       id: ''
     };
@@ -87,30 +92,27 @@ export class ManageQueComponent implements OnChanges {
     this.questionType = '';
     this.difficulty = '';
     this.correctAnswer = '';
-    this.options = ['', '', '', ''];  // Reset options
+    this.codeText = '';
+    this.options = ['', '', '', ''];
   }
 
-  // Open delete confirmation dialog
   openDeleteConfirmDialog(question: Question) {
     this.questionToDelete = question;
     this.showDeleteConfirm = true;
   }
 
-  // Cancel delete
   cancelDelete() {
     this.showDeleteConfirm = false;
-    this.questionToDelete ;
+    this.questionToDelete = undefined!;
   }
 
-  // Confirm delete
   confirmDelete() {
-    if (this.questionToDelete) {  // No null check anymore, questionToDelete is always defined
+    if (this.questionToDelete) {
       this.api.deleteQuestion(this.questionToDelete.id).subscribe(
         () => {
-          // Remove the question from the list after successful deletion
           this.currentQuestions = this.currentQuestions.filter(q => q.id !== this.questionToDelete.id);
           this.showDeleteConfirm = false;
-          this.questionToDelete ;  // After deletion, set to null
+          this.questionToDelete = undefined!;
         },
         (error) => {
           console.error('Error deleting question:', error);
@@ -118,5 +120,77 @@ export class ManageQueComponent implements OnChanges {
         }
       );
     }
+  }
+
+  handleBulkTextChange(event: any) {
+    this.bulkText = event.target.value;
+  }
+
+  onBulkFileChange(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    this.bulkFileName = file.name;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.bulkText = e.target.result;
+    };
+    reader.readAsText(file);
+  }
+
+  parseBulkQuestions(): Question[] {
+    const lines = this.bulkText.split('\n').map(l => l.trim()).filter(Boolean);
+    const questions: Question[] = [];
+
+    for (let i = 0; i < lines.length;) {
+      const questionLine = lines[i];
+      const options = lines.slice(i + 1, i + 5);
+      const answerLine = lines[i + 5];
+
+      if (options.length < 4 || !answerLine) break;
+
+      questions.push({
+        id: '',
+        questionText: questionLine,
+        options,
+        correctAnswer: answerLine,
+        type: 'MCQ',
+        difficulty: 'Medium',
+        subjectId: this.subject.id,
+        text: '',
+        answer: ''
+      });
+
+      i += 6; // Next question block
+    }
+
+    return questions;
+  }
+
+  submitBulkQuestions() {
+    if (!this.bulkText.trim()) {
+      alert('Please paste or upload MCQ data.');
+      return;
+    }
+
+    const questions = this.parseBulkQuestions();
+    if (questions.length === 0) {
+      alert('No valid questions found. Please check your input format.');
+      return;
+    }
+
+    this.api.addBulkQuestions(questions).subscribe(
+      res => {
+        console.log('Bulk questions added successfully:', res);
+        this.bulkText = '';
+        this.bulkFileName = '';
+        this.loadQuestionsForSubject();
+        alert(`${questions.length} questions added successfully.`);
+      },
+      err => {
+        console.error('Error adding bulk questions:', err);
+        alert('Failed to upload bulk questions.');
+      }
+    );
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ApiService } from '../../../api.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
 
 @Component({
   selector: 'app-m-cards',
@@ -65,22 +66,56 @@ export class MCardsComponent implements OnInit {
     this.subjectToDelete = null;
     this.showConfirmDialog = false;
   }
+confirmDelete(): void {
+  if (!this.subjectToDelete) return;
 
-  confirmDelete(): void {
-    if (!this.subjectToDelete) return;
-
-    this.api.deleteSubject(this.subjectToDelete.id).subscribe({
-      next: () => {
-        this.subjects = this.subjects.filter(s => s.id !== this.subjectToDelete.id);
-        this.deleteQuestionsForSubject(this.subjectToDelete.id);
-        this.cancelDelete();
-      },
-      error: err => {
-        console.error('Failed to delete subject:', err);
-        this.cancelDelete();
-      }
-    });
+  const subjectId = this.subjectToDelete.id;
+  if (!subjectId) {
+    console.error('Subject ID is null or undefined. Cannot proceed.');
+    return;
   }
+
+  this.api.getQuestionsBySubject(subjectId).subscribe({
+    next: questions => {
+      const validQuestions = questions.filter((q: any) => q.id);
+      if (validQuestions.length < questions.length) {
+        console.warn('Some questions have invalid or missing IDs and will not be deleted.');
+      }
+
+      const deleteRequests = validQuestions.map((q: any) => this.api.deleteQuestion(q.id));
+
+      if (deleteRequests.length > 0) {
+        forkJoin(deleteRequests).subscribe({
+          next: () => this.deleteSubject(subjectId),
+          error: err => {
+            console.error('Failed to delete related questions:', err);
+            this.cancelDelete();
+          }
+        });
+      } else {
+        this.deleteSubject(subjectId);
+      }
+    },
+    error: err => {
+      console.error('Error fetching questions to delete:', err);
+      this.cancelDelete();
+    }
+  });
+}
+
+
+deleteSubject(subjectId: any): void {
+  this.api.deleteSubject(subjectId).subscribe({
+    next: () => {
+      this.subjects = this.subjects.filter(s => s.id !== subjectId);
+      this.cancelDelete();
+    },
+    error: err => {
+      console.error('Failed to delete subject:', err);
+      this.cancelDelete();
+    }
+  });
+}
 
   deleteQuestionsForSubject(subjectId: string): void {
     this.api.getQuestionsBySubject(subjectId).subscribe({

@@ -1,6 +1,5 @@
 <!-- Wrapper to center card -->
 <div class="min-h-screen flex items-center justify-center bg-[#0F1020]">
-
   <!-- Card -->
   <div
     class="w-[400px] p-5 border border-[#0d1117] rounded-xl bg-black shadow-md cursor-pointer transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg font-sans"
@@ -33,12 +32,19 @@
         </p>
 
         <div *ngIf="questions.length > 0">
+          
+          <!-- ✅ Code Snippet (if any) -->
+          <div *ngIf="questions[currentQuestionIndex].text" class="bg-[#1E1E1E] text-green-300 text-sm p-4 rounded mb-3 font-mono overflow-auto whitespace-pre-wrap">
+            <pre>{{ questions[currentQuestionIndex].text }}</pre>
+          </div>
+
+          <!-- ✅ Question Text -->
           <h3 class="text-base font-semibold mb-3">
             {{ currentQuestionIndex + 1 }}. {{ questions[currentQuestionIndex].questionText }}
           </h3>
 
+          <!-- ✅ Options -->
           <form class="space-y-4">
-            <!-- ✅ Custom Styled Radio Buttons -->
             <div *ngFor="let option of questions[currentQuestionIndex].options" class="relative">
               <input
                 class="absolute opacity-0 peer"
@@ -69,5 +75,4 @@
       </div>
     </div>
   </div>
-
 </div>
