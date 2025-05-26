@@ -1,8 +1,38 @@
 {
   "adminUsers": [
-    { "id": 1, "username": "admin", "password": "admin123" }
+    {
+      "id": "1",
+      "username": "admin",
+      "password": "admin123"
+    }
   ],
-  "subjects": [],
-  "questions": [],
+  "subjects": [
+    {
+      "id": "d84c",
+      "subjectName": "angular",
+      "subjectCode": "a123",
+      "examDate": "2025-05-01",
+      "examTime": "15:36",
+      "duration": 60
+    }
+  ],
+  "questions": [
+    {
+      "id": "urkzz3366",
+      "questionText": "dsdaas",
+      "options": [
+        "asdad",
+        "uyguy",
+        "dad",
+        "adasd"
+      ],
+      "correctAnswer": "dad",
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "subjectId": "d84c",
+      "text": "",
+      "answer": ""
+    }
+  ],
   "results": []
 }

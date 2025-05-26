@@ -31,55 +31,52 @@
       </div>
 
       <div class="p-6 pt-0">
-        <form>
+      <form #loginForm="ngForm" (ngSubmit)="startExam(loginForm)">
+  <!-- Student Name -->
+  <div class="mb-4">
+    <div class="group relative rounded-lg border focus-within:border-green-300 px-3 pb-1.5 pt-2.5 duration-200 focus-within:ring focus-within:ring-green-300/30">
+      <label class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400">Your Name</label>
+      <input
+        type="text"
+        name="studentName"
+        [(ngModel)]="studentName"
+        placeholder="e.g. Neo"
+        required
+        class="block w-full border-0 bg-transparent p-0 text-sm placeholder:text-muted-foreground/90 focus:outline-none focus:ring-0 sm:leading-7 text-white"
+      />
+    </div>
+  </div>
 
-          <!-- Student Name -->
-          <div class="mb-4">
-            <div
-              class="group relative rounded-lg border focus-within:border-green-300 px-3 pb-1.5 pt-2.5 duration-200 focus-within:ring focus-within:ring-green-300/30">
-              <label class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400">Your
-                Name</label>
-              <input
-                type="text"
-                [(ngModel)]="studentName"
-                placeholder="e.g. Neo"
-                class="block w-full border-0 bg-transparent p-0 text-sm placeholder:text-muted-foreground/90 focus:outline-none focus:ring-0 sm:leading-7 text-white"
-              />
-            </div>
-          </div>
+  <!-- Subject Dropdown -->
+  <div class="mb-6">
+    <div class="group relative rounded-lg border focus-within:border-green-300 px-3 pb-1.5 pt-2.5 duration-200 focus-within:ring focus-within:ring-green-300/30">
+      <label class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400">Choose Subject</label>
+      <select
+        name="selectedSubject"
+        [(ngModel)]="selectedSubject"
+        required
+        class="block w-full border-0 bg-transparent p-0 text-sm placeholder:text-muted-foreground/90 focus:outline-none focus:ring-0 text-white"
+      >
+        <option  [ngValue]="null" disabled selected>Select Subject</option>
+        <option class="text-black" *ngFor="let subject of subjects" [ngValue]="subject">
+          {{ subject.subjectName }}
+        </option>
+      </select>
+    </div>
+  </div>
 
-          <!-- Subject Dropdown -->
-          <div class="mb-6">
-            <div
-              class="group relative rounded-lg border focus-within:border-green-300 px-3 pb-1.5 pt-2.5 duration-200 focus-within:ring focus-within:ring-green-300/30">
-              <label class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400">Choose
-                Subject</label>
-              <select
-                [(ngModel)]="selectedSubject"
-                class="block w-full border-0 bg-transparent p-0 text-sm placeholder:text-muted-foreground/90 focus:outline-none focus:ring-0 text-white"
-                [ngModelOptions]="{ standalone: true }"
-              >
-                <option [ngValue]="null" disabled selected>Select Subject</option>
-                <option *ngFor="let subject of subjects" [ngValue]="subject">
-                  {{ subject.subjectName }}
-                </option>
-              </select>
-            </div>
-          </div>
+  <!-- Button -->
+  <div class="flex items-center justify-end gap-x-2">
+    <button
+      type="submit"
+      [disabled]="!loginForm.valid"
+      class="font-semibold hover:bg-black hover:text-white hover:ring hover:ring-white transition duration-300 inline-flex items-center justify-center rounded-md text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-black h-10 px-4 py-2"
+    >
+      Start Exam
+    </button>
+  </div>
+</form>
 
-          <!-- Button -->
-          <div class="flex items-center justify-end gap-x-2">
-            <button
-              (click)="startExam()"
-              [disabled]="!studentName || !selectedSubject"
-              type="button"
-              class="font-semibold hover:bg-black hover:text-white hover:ring hover:ring-white transition duration-300 inline-flex items-center justify-center rounded-md text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-black h-10 px-4 py-2"
-            >
-              Start Exam
-            </button>
-          </div>
-
-        </form>
       </div>
     </div>
   </div>
