@@ -8,29 +8,344 @@
   ],
   "subjects": [
     {
-      "id": "d84c",
-      "subjectName": "angular",
-      "subjectCode": "a123",
-      "examDate": "2025-05-01",
-      "examTime": "15:36",
-      "duration": 60
+      "id": "7777",
+      "subjectName": "Java script",
+      "subjectCode": "123123"
     }
   ],
   "questions": [
     {
-      "id": "urkzz3366",
-      "questionText": "dsdaas",
+      "id": "0gydv9pex",
+      "questionText": "What will be the output of the following JavaScript code?",
       "options": [
-        "asdad",
-        "uyguy",
-        "dad",
-        "adasd"
+        "10 and 10",
+        "10 and 15",
+        "15 and 15",
+        "undefined and 15"
       ],
-      "correctAnswer": "dad",
+      "correctAnswer": "10 and 15",
       "type": "MCQ",
-      "difficulty": "Medium",
-      "subjectId": "d84c",
-      "text": "",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let a = 10;\nlet b = a;\n\nb = b + 5;\n\nconsole.log(a);\nconsole.log(b);",
+      "answer": ""
+    },
+    {
+      "id": "q1",
+      "questionText": "Which of the following will log 'Hello, JavaScript!'?",
+      "options": [
+        "console.print('Hello, JavaScript!')",
+        "echo('Hello, JavaScript!')",
+        "console.log('Hello, JavaScript!')",
+        "print('Hello, JavaScript!')"
+      ],
+      "correctAnswer": "console.log('Hello, JavaScript!')",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "console.log('Hello, JavaScript!');",
+      "answer": ""
+    },
+    {
+      "id": "q2",
+      "questionText": "What will the following code print?",
+      "options": [
+        "15",
+        "510",
+        "undefined",
+        "Error"
+      ],
+      "correctAnswer": "15",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let x = 5;\nlet y = 10;\nconsole.log(x + y);",
+      "answer": ""
+    },
+    {
+      "id": "q3",
+      "questionText": "Which is the correct way to write a single-line comment in JavaScript?",
+      "options": [
+        "<!-- This is a comment -->",
+        "// This is a comment",
+        "# This is a comment",
+        "/* This is a comment */"
+      ],
+      "correctAnswer": "// This is a comment",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "// This is a comment",
+      "answer": ""
+    },
+    {
+      "id": "q4",
+      "questionText": "What does the following code output?",
+      "options": [
+        "Line 1 and Line 2",
+        "Line 3",
+        "All lines",
+        "Error"
+      ],
+      "correctAnswer": "Line 3",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "/*\nconsole.log('Line 1');\nconsole.log('Line 2');\n*/\nconsole.log('Line 3');",
+      "answer": ""
+    },
+    {
+      "id": "q5",
+      "questionText": "What will the code below log?",
+      "options": [
+        "10",
+        "15",
+        "5",
+        "Error"
+      ],
+      "correctAnswer": "15",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "var a = 10;\nvar b = a + 5;\nconsole.log(b);",
+      "answer": ""
+    },
+    {
+      "id": "q6",
+      "questionText": "What is the output of the following code?",
+      "options": [
+        "3 3",
+        "3 2",
+        "2 3",
+        "Error"
+      ],
+      "correctAnswer": "3 2",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let x = 2;\n{\n  let x = 3;\n  console.log(x);\n}\nconsole.log(x);",
+      "answer": ""
+    },
+    {
+      "id": "q7",
+      "questionText": "Will the following code throw an error?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "correctAnswer": "Yes",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let x = 5;\nlet x = 6;\nconsole.log(x);",
+      "answer": ""
+    },
+    {
+      "id": "q8",
+      "questionText": "What happens when this code runs?",
+      "options": [
+        "15",
+        "10",
+        "Error",
+        "undefined"
+      ],
+      "correctAnswer": "Error",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "const x = 10;\nx = 15;\nconsole.log(x);",
+      "answer": ""
+    },
+    {
+      "id": "q9",
+      "questionText": "What is the output?",
+      "options": [
+        "Error",
+        "[1, 2, 3]",
+        "undefined",
+        "[3]"
+      ],
+      "correctAnswer": "[1, 2, 3]",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "const arr = [1, 2];\narr.push(3);\nconsole.log(arr);",
+      "answer": ""
+    },
+    {
+      "id": "q10",
+      "questionText": "What will be printed?",
+      "options": [
+        "6",
+        "8",
+        "9",
+        "Error"
+      ],
+      "correctAnswer": "8",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "console.log(2 ** 3);",
+      "answer": ""
+    },
+    {
+      "id": "q11",
+      "questionText": "What is the output?",
+      "options": [
+        "true",
+        "false",
+        "Error",
+        "undefined"
+      ],
+      "correctAnswer": "true",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "console.log(5 > 2 && 2 > 1);",
+      "answer": ""
+    },
+    {
+      "id": "q12",
+      "questionText": "What is the result of 10 % 3?",
+      "options": [
+        "3",
+        "1",
+        "0",
+        "10"
+      ],
+      "correctAnswer": "1",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "console.log(10 % 3);",
+      "answer": ""
+    },
+    {
+      "id": "q13",
+      "questionText": "What will be the output?",
+      "options": [
+        "10",
+        "15",
+        "5",
+        "Error"
+      ],
+      "correctAnswer": "15",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let x = 10;\nx += 5;\nconsole.log(x);",
+      "answer": ""
+    },
+    {
+      "id": "q14",
+      "questionText": "What is the type of 'Hello'?",
+      "options": [
+        "string",
+        "number",
+        "boolean",
+        "object"
+      ],
+      "correctAnswer": "string",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let name = \"Hello\";\nconsole.log(typeof name);",
+      "answer": ""
+    },
+    {
+      "id": "q15",
+      "questionText": "What will be printed?",
+      "options": [
+        "true",
+        "false",
+        "undefined",
+        "Error"
+      ],
+      "correctAnswer": "true",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let isDone = true;\nconsole.log(typeof isDone);",
+      "answer": ""
+    },
+    {
+      "id": "q16",
+      "questionText": "What does typeof NaN return?",
+      "options": [
+        "NaN",
+        "number",
+        "undefined",
+        "object"
+      ],
+      "correctAnswer": "number",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "console.log(typeof NaN);",
+      "answer": ""
+    },
+    {
+      "id": "q17",
+      "questionText": "What will be the output?",
+      "options": [
+        "object",
+        "array",
+        "list",
+        "undefined"
+      ],
+      "correctAnswer": "object",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "console.log(typeof []);",
+      "answer": ""
+    },
+    {
+      "id": "q18",
+      "questionText": "Which keyword is used to declare a constant variable?",
+      "options": [
+        "var",
+        "let",
+        "const",
+        "constant"
+      ],
+      "correctAnswer": "const",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "const value = 100; console.log(value);",
+      "answer": ""
+    },
+    {
+      "id": "q19",
+      "questionText": "What is the output?",
+      "options": [
+        "boolean",
+        "undefined",
+        "string",
+        "number"
+      ],
+      "correctAnswer": "undefined",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let a; console.log(typeof a);",
+      "answer": ""
+    },
+    {
+      "id": "q20",
+      "questionText": "Which operator is used to assign a value?",
+      "options": [
+        "==",
+        "=",
+        "===",
+        "+"
+      ],
+      "correctAnswer": "=",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "7777",
+      "text": "let x = 5;",
       "answer": ""
     }
   ],

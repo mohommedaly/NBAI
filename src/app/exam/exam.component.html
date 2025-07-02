@@ -1,51 +1,50 @@
-<!-- Wrapper to center card -->
-<div class="min-h-screen flex items-center justify-center bg-[#0F1020]">
+<!-- Center Wrapper -->
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0F1020] to-[#1a1b2e]">
   <!-- Card -->
-  <div
-    class="w-[400px] p-5 border border-[#0d1117] rounded-xl bg-black shadow-md cursor-pointer transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg font-sans"
-  >
-    <!-- Mac Header -->
-    <div class="flex items-center gap-2 mb-4">
+  <div class="w-full max-w-md p-6 border border-[#1f2937] rounded-2xl bg-[#111827] shadow-lg hover:shadow-2xl transition duration-300 font-sans">
+
+    <!-- Mac Window Header -->
+    <div class="flex items-center gap-2 mb-6">
       <span class="w-3 h-3 rounded-full bg-[#ff5f57]"></span>
       <span class="w-3 h-3 rounded-full bg-[#ffbd2e]"></span>
       <span class="w-3 h-3 rounded-full bg-[#28c941]"></span>
     </div>
 
-    <!-- Exam Content -->
+    <!-- Content Area -->
     <div class="text-white font-['Tomorrow']">
 
-      <!-- ✅ Thank You Message -->
+      <!-- Thank You Message -->
       <div *ngIf="submitted" class="text-center">
-        <h2 class="text-2xl font-bold mb-4 text-[#39FF14]">Thank You!</h2>
-        <p class="text-base text-[#B3FFB3]">Your exam has been submitted successfully.</p>
+        <h2 class="text-3xl font-bold mb-3 text-[#39FF14]">🎉 Thank You!</h2>
+        <p class="text-sm text-[#B3FFB3] mb-5">Your exam was submitted successfully.</p>
         <a routerLink="/login"
-          class="mt-4 inline-block bg-[#39FF14] text-[#0F1020] px-4 py-2 rounded hover:bg-[#00FF00] transition">
-          Back to Home
+           class="inline-block bg-[#39FF14] text-[#0F1020] font-semibold px-5 py-2 rounded-lg shadow hover:bg-[#00FF00] transition duration-200">
+          🔙 Back to Home
         </a>
       </div>
 
-      <!-- ✅ Exam Question with Timer -->
+      <!-- Exam Section -->
       <div *ngIf="!submitted">
-        <h2 class="text-xl font-semibold mb-4">Welcome, {{ studentName }}</h2>
-        <p class="mb-2 text-sm">Time Left:
-          <strong class="text-red-400">{{ countdown }}</strong> seconds
-        </p>
+        <h2 class="text-xl font-semibold mb-2">👋 Welcome, {{ studentName }}</h2>
+        <p class="text-sm text-gray-300 mb-4">⏱ Time Left: <strong class="text-red-400">{{ countdown }}</strong> seconds</p>
 
+        <!-- If there are questions -->
         <div *ngIf="questions.length > 0">
-          
-          <!-- ✅ Code Snippet (if any) -->
-          <div *ngIf="questions[currentQuestionIndex].text" class="bg-[#1E1E1E] text-green-300 text-sm p-4 rounded mb-3 font-mono overflow-auto whitespace-pre-wrap">
+
+          <!-- Code Snippet Box -->
+          <div *ngIf="questions[currentQuestionIndex].text"
+               class="bg-[#1e1e1e] text-green-400 text-sm p-4 rounded-lg font-mono mb-4 overflow-auto whitespace-pre-wrap shadow-inner">
             <pre>{{ questions[currentQuestionIndex].text }}</pre>
           </div>
 
-          <!-- ✅ Question Text -->
+          <!-- Question Text -->
           <h3 class="text-base font-semibold mb-3">
             {{ currentQuestionIndex + 1 }}. {{ questions[currentQuestionIndex].questionText }}
           </h3>
 
-          <!-- ✅ Options -->
-          <form class="space-y-4">
-            <div *ngFor="let option of questions[currentQuestionIndex].options" class="relative">
+          <!-- Options List -->
+          <form class="space-y-3">
+            <div *ngFor="let option of questions[currentQuestionIndex].options" class="relative group">
               <input
                 class="absolute opacity-0 peer"
                 type="radio"
@@ -56,23 +55,23 @@
               />
               <label
                 [attr.for]="option"
-                class="flex items-center p-3 mb-3 bg-[#111] border border-[#ccc] rounded text-white transition-colors cursor-pointer
-                       peer-checked:bg-[#b80000] peer-checked:border-[#ff1111] peer-focus:outline peer-focus:outline-2 peer-focus:outline-[#ff1111]
-                       hover:bg-black"
+                class="flex items-center gap-3 bg-[#1f2937] p-3 rounded-lg text-white border border-gray-600
+                       peer-checked:bg-[#b80000] peer-checked:border-[#ff1111]
+                       hover:bg-[#2a2e3d] cursor-pointer transition duration-200"
               >
-                <span class="w-4 h-4 mr-3 rounded-full border-2 border-white relative transition-colors 
-                             peer-checked:border-[#ff1111] hover:border-[#e9e9e9]">
+                <span class="w-5 h-5 rounded-full border-2 border-white relative flex-shrink-0">
                   <span
-                    class="absolute top-1/2 left-1/2 w-2 h-2 bg-[#ff1111] rounded-full transform -translate-x-1/2 -translate-y-1/2
+                    class="absolute top-1/2 left-1/2 w-2.5 h-2.5 bg-[#ff1111] rounded-full transform -translate-x-1/2 -translate-y-1/2
                            opacity-0 peer-checked:opacity-100"
                   ></span>
                 </span>
-                <span class="text-base font-semibold">{{ option }}</span>
+                <span class="text-sm font-medium">{{ option }}</span>
               </label>
             </div>
           </form>
         </div>
       </div>
+
     </div>
   </div>
 </div>
