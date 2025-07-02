@@ -18,7 +18,7 @@ interface Question {
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:3000';
+  private baseUrl = 'https://json-server-db-exam.onrender.com';
 
   private studentName: string = '';
   private questions: any[] = [];
