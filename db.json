@@ -11,6 +11,11 @@
       "id": "7777",
       "subjectName": "Java script",
       "subjectCode": "123123"
+    },
+    {
+      "id": "8888",
+      "subjectName": "HTML",
+      "subjectCode": "HTML101"
     }
   ],
   "questions": [
@@ -346,6 +351,326 @@
       "difficulty": "Easy",
       "subjectId": "7777",
       "text": "let x = 5;",
+      "answer": ""
+    },
+    {
+      "id": "html1",
+      "questionText": "HTML ka full form kya hai?",
+      "options": [
+        "Hyper Text Markup Language",
+        "High Text Machine Language",
+        "Hyperlink Text Management Language",
+        "Home Text Markup Language"
+      ],
+      "correctAnswer": "Hyper Text Markup Language",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html2",
+      "questionText": "HTML document ki beginning mein kaunsa declaration use hota hai?",
+      "options": [
+        "<html>",
+        "<!DOCTYPE html>",
+        "<head>",
+        "<body>"
+      ],
+      "correctAnswer": "<!DOCTYPE html>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html3",
+      "questionText": "HTML ka visible content generally kis tag ke andar hota hai?",
+      "options": [
+        "<head>",
+        "<title>",
+        "<body>",
+        "<meta>"
+      ],
+      "correctAnswer": "<body>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html4",
+      "questionText": "Sabse bada heading kaunsa hai?",
+      "options": [
+        "<h6>",
+        "<heading>",
+        "<h1>",
+        "<head>"
+      ],
+      "correctAnswer": "<h1>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html5",
+      "questionText": "Paragraph create karne ke liye kaunsa tag use hota hai?",
+      "options": [
+        "<para>",
+        "<p>",
+        "<paragraph>",
+        "<text>"
+      ],
+      "correctAnswer": "<p>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html6",
+      "questionText": "Line break ke liye kaunsa tag use hota hai?",
+      "options": [
+        "<break>",
+        "<lb>",
+        "<br>",
+        "<line>"
+      ],
+      "correctAnswer": "<br>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html7",
+      "questionText": "HTML mein comment likhne ka correct syntax kya hai?",
+      "options": [
+        "// Comment",
+        "/* Comment */",
+        "<!-- Comment -->",
+        "# Comment"
+      ],
+      "correctAnswer": "<!-- Comment -->",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html8",
+      "questionText": "Link banane ke liye kaunsa HTML tag use hota hai?",
+      "options": [
+        "<link>",
+        "<a>",
+        "<href>",
+        "<url>"
+      ],
+      "correctAnswer": "<a>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html9",
+      "questionText": "<a> tag mein webpage ka URL specify karne ke liye kaunsa attribute use hota hai?",
+      "options": [
+        "src",
+        "link",
+        "href",
+        "url"
+      ],
+      "correctAnswer": "href",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html10",
+      "questionText": "Image ka path specify karne ke liye kaunsa attribute use hota hai?",
+      "options": [
+        "href",
+        "src",
+        "alt",
+        "path"
+      ],
+      "correctAnswer": "src",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html11",
+      "questionText": "<img> tag mein alt attribute ka main purpose kya hai?",
+      "options": [
+        "Image ka size set karna",
+        "Image ka border set karna",
+        "Alternative text provide karna",
+        "Image ko center karna"
+      ],
+      "correctAnswer": "Alternative text provide karna",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html12",
+      "questionText": "Ordered list ke liye kaunsa tag use hota hai?",
+      "options": [
+        "<ul>",
+        "<ol>",
+        "<li>",
+        "<list>"
+      ],
+      "correctAnswer": "<ol>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html13",
+      "questionText": "Unordered list ke liye kaunsa tag use hota hai?",
+      "options": [
+        "<ul>",
+        "<ol>",
+        "<li>",
+        "<dl>"
+      ],
+      "correctAnswer": "<ul>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html14",
+      "questionText": "List item ko define karne ke liye kaunsa tag use hota hai?",
+      "options": [
+        "<item>",
+        "<list>",
+        "<li>",
+        "<ul>"
+      ],
+      "correctAnswer": "<li>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html15",
+      "questionText": "Text ko bold importance ke saath show karne ke liye kaunsa semantic tag better hai?",
+      "options": [
+        "<bold>",
+        "<b>",
+        "<strong>",
+        "<big>"
+      ],
+      "correctAnswer": "<strong>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html16",
+      "questionText": "Emphasized text ke liye kaunsa tag use hota hai?",
+      "options": [
+        "<em>",
+        "<italic>",
+        "<i>",
+        "<emphasis>"
+      ],
+      "correctAnswer": "<em>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html17",
+      "questionText": "HTML mein <div> ka primary use kya hai?",
+      "options": [
+        "Image add karna",
+        "Content ko group/structure karna",
+        "Form submit karna",
+        "Heading create karna"
+      ],
+      "correctAnswer": "Content ko group/structure karna",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html18",
+      "questionText": "Form banane ke liye kaunsa tag use hota hai?",
+      "options": [
+        "<input>",
+        "<form>",
+        "<fieldset>",
+        "<data>"
+      ],
+      "correctAnswer": "<form>",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html19",
+      "questionText": "Email input ke liye correct input type kya hai?",
+      "options": [
+        "<input type=\"mail\">",
+        "<input type=\"email\">",
+        "<input type=\"text-email\">",
+        "<input type=\"e-mail\">"
+      ],
+      "correctAnswer": "<input type=\"email\">",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
+      "answer": ""
+    },
+    {
+      "id": "html20",
+      "questionText": "Semantic HTML ka main benefit kya hai?",
+      "options": [
+        "Website ka internet speed badhana",
+        "HTML file ko automatically compress karna",
+        "Content ki meaning aur structure ko clearly define karna",
+        "CSS ko remove karna"
+      ],
+      "correctAnswer": "Content ki meaning aur structure ko clearly define karna",
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "subjectId": "8888",
+      "text": "",
       "answer": ""
     }
   ],
