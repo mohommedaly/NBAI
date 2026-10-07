@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { forkJoin, Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-interface Question {
-  id: string;
+export interface Question {
+  id?: string;
   questionText: string;
   options: string[];
   correctAnswer: string;
@@ -14,11 +14,27 @@ interface Question {
   answer: string;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+export interface Subject {
+  id?: string;
+  subjectName: string;
+  subjectCode: string;
+}
+
+export interface Result {
+  id?: string;
+  studentName: string;
+  subjectId: string;
+  score: number;
+  total: number;
+  date?: string;
+  subName?: string;
+  answers?: any[];
+}
+
+@Injectable({ providedIn: 'root' })
 export class ApiService {
-  private baseUrl = 'https://json-server-db-exam.onrender.com';
+
+  private baseUrl = 'https://script.google.com/macros/s/AKfycbycYiuTM9slfUlnT5Qrkf9JKqaEoK6VQJvCIBqeMo-IUo8f3m4xrEUQAlAlU0QIoFLq/exec';
 
   private studentName: string = '';
   private questions: any[] = [];
@@ -27,92 +43,108 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  // 🔹 Utility method to generate a unique id
+  // ---------- INTERNAL ----------
   private generateId(): string {
     return Math.random().toString(36).substr(2, 9);
   }
 
-  // 🔹 Subject Management
-  addSubject(subject: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/subjects`, subject);
-  }
+  private call(action: string, sheet: string, params: any = {}, body?: any): Observable<any> {
+    let httpParams = new HttpParams()
+      .set('action', action)
+      .set('sheet', sheet);
 
-  updateSubject(id: string, subject: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/subjects/${id}`, subject);
-  }
+    Object.keys(params).forEach(k => {
+      if (params[k] !== undefined && params[k] !== null) {
+        httpParams = httpParams.set(k, String(params[k]));
+      }
+    });
 
-  deleteSubject(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/subjects/${id}`);
-  }
+    const url = `${this.baseUrl}?${httpParams.toString()}`;
 
-  getSubjects(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/subjects`);
-  }
-
-  setSelectedSubject(subject: any): void {
-    this.selectedSubject = subject; // ✅ Store full subject object
-  }
-
-  getSelectedSubject(): any {
-    return this.selectedSubject;
-  }
-
-  // 🔹 Student Management
-  setStudentName(name: string): void {
-    this.studentName = name;
-  }
-
-  getStudentName(): string {
-    return this.studentName;
-  }
-
-  // 🔹 Question Management
-  loadQuestions(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/questions`);
-  }
-
-  getQuestionsBySubject(subjectId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/questions?subjectId=${subjectId}`);
-  }
-
-  addQuestion(question: any): Observable<any> {
-    // Ensure the question has a unique id before posting
-    if (!question.id) {
-      question.id = this.generateId();
+    if (body) {
+      // ✅ CORS-safe POST — text/plain bhejta hai (no preflight)
+      return this.http.post(url, JSON.stringify(body), {
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+      });
     }
-    return this.http.post<any>(`${this.baseUrl}/questions`, question);
+    return this.http.get(url);
+  }
+
+  // ---------- SETUP ----------
+  setupAllSheets(): Observable<any> {
+    return this.call('setupAll', '');
+  }
+
+  // ---------- SUBJECTS ----------
+  addSubject(subject: Subject): Observable<any> {
+    if (!subject.id) subject.id = this.generateId();
+    return this.call('add', 'subjects', {}, subject);
+  }
+
+  updateSubject(id: string, subject: Subject): Observable<any> {
+    return this.call('update', 'subjects', { id }, subject);
+  }
+
+  deleteSubject(id: string | number): Observable<any> {
+    return this.call('delete', 'subjects', { id: String(id) });
+  }
+
+  getSubjects(): Observable<Subject[]> {
+    return this.call('getAll', 'subjects');
+  }
+
+  setSelectedSubject(subject: any): void { this.selectedSubject = subject; }
+  getSelectedSubject(): any { return this.selectedSubject; }
+
+  // ---------- STUDENT ----------
+  setStudentName(name: string): void { this.studentName = name; }
+  getStudentName(): string { return this.studentName; }
+
+  // ---------- QUESTIONS ----------
+  loadQuestions(): Observable<Question[]> {
+    return this.call('getAll', 'questions');
+  }
+
+  getQuestionsBySubject(subjectId: string): Observable<Question[]> {
+    return this.call('getByField', 'questions', {
+      field: 'subjectId',
+      value: subjectId
+    });
+  }
+
+  addQuestion(question: Question): Observable<any> {
+    if (!question.id) question.id = this.generateId();
+    return this.call('add', 'questions', {}, question);
   }
 
   deleteQuestion(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/questions/${id}`);
+    return this.call('delete', 'questions', { id });
   }
 
-  addBulkQuestions(questions: any[]): Observable<any[]> {
-    // For each question, assign an id if missing
-    const questionsWithId = questions.map(q => {
-      if (!q.id) {
-        q.id = this.generateId();
-      }
+  addBulkQuestions(questions: Question[]): Observable<any> {
+    const rows = questions.map(q => {
+      if (!q.id) q.id = this.generateId();
       return q;
     });
-    return forkJoin(
-      questionsWithId.map(q => this.http.post(`${this.baseUrl}/questions`, q))
-    );
+    return this.call('addBulk', 'questions', {}, { rows });
   }
 
-  // 🔹 Result Management
-  submitResult(result: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/results`, result);
+  // ---------- RESULTS ----------
+  submitResult(result: Result): Observable<any> {
+    if (!result.id) result.id = this.generateId();
+    if (!result.date) result.date = new Date().toISOString();
+    return this.call('add', 'results', {}, result);
   }
 
   deleteResult(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/results/${id}`);
+    return this.call('delete', 'results', { id });
   }
 
-  getAllResults(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/results`);
+  getAllResults(): Observable<Result[]> {
+    return this.call('getAll', 'results');
   }
 
+  // ---------- IN-MEMORY RESULT ----------
   setResult(questions: any[], score: number): void {
     this.questions = questions;
     this.score = score;

@@ -1,17 +1,12 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ApiService } from '../../../api.service';
+import { ApiService, Question } from '../../../api.service';   // 👈 service se import
 
-interface Question {
-  id: string;
-  questionText: string;
-  options: string[];
-  correctAnswer: string;
-  type: string;
-  difficulty: string;
-  subjectId: string;
-  text: any; // for code snippet
-  answer: any;
-}
+// ❌ Local interface HATA DO — ye clash kar raha tha
+// interface Question {
+//   id?: string;
+//   questionText: string;
+//   ...
+// }
 
 @Component({
   selector: 'app-manage-que',
@@ -32,7 +27,6 @@ export class ManageQueComponent implements OnChanges {
   showDeleteConfirm = false;
   questionToDelete!: Question;
 
-  // 👇 Bulk upload support
   bulkText: string = '';
   bulkFileError: string = '';
   bulkFileName: string = '';
@@ -71,8 +65,8 @@ export class ManageQueComponent implements OnChanges {
       difficulty: this.difficulty,
       subjectId: this.subject.id,
       text: this.codeText,
-      answer: '',
-      id: ''
+      answer: ''
+      // 👈 id mat do — service auto-generate karegi
     };
 
     this.api.addQuestion(question).subscribe(
@@ -107,19 +101,21 @@ export class ManageQueComponent implements OnChanges {
   }
 
   confirmDelete() {
-    if (this.questionToDelete) {
-      this.api.deleteQuestion(this.questionToDelete.id).subscribe(
-        () => {
-          this.currentQuestions = this.currentQuestions.filter(q => q.id !== this.questionToDelete.id);
-          this.showDeleteConfirm = false;
-          this.questionToDelete = undefined!;
-        },
-        (error) => {
-          console.error('Error deleting question:', error);
-          this.showDeleteConfirm = false;
-        }
-      );
-    }
+    const questionId = this.questionToDelete?.id;
+
+    if (!questionId) return;
+
+    this.api.deleteQuestion(questionId).subscribe(
+      () => {
+        this.currentQuestions = this.currentQuestions.filter(q => q.id !== questionId);
+        this.showDeleteConfirm = false;
+        this.questionToDelete = undefined!;
+      },
+      (error) => {
+        console.error('Error deleting question:', error);
+        this.showDeleteConfirm = false;
+      }
+    );
   }
 
   handleBulkTextChange(event: any) {
@@ -150,7 +146,7 @@ export class ManageQueComponent implements OnChanges {
       if (options.length < 4 || !answerLine) break;
 
       questions.push({
-        id: '',
+        // 👈 id mat do — service auto-generate karegi
         questionText: questionLine,
         options,
         correctAnswer: answerLine,
@@ -161,7 +157,7 @@ export class ManageQueComponent implements OnChanges {
         answer: ''
       });
 
-      i += 6; // Next question block
+      i += 6;
     }
 
     return questions;

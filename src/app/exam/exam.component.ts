@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ApiService } from '../api.service';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -7,12 +7,13 @@ import { Router, ActivatedRoute } from '@angular/router';
   templateUrl: './exam.component.html',
   styleUrls: ['./exam.component.scss']
 })
-export class ExamComponent implements OnInit {
+export class ExamComponent implements OnInit, OnDestroy {
   questions: any[] = [];
   currentQuestionIndex = 0;
   score = 0;
   studentName = '';
   submitted = false;
+  loading = true;
 
   countdown = 60;
   timer: any;
@@ -42,26 +43,60 @@ export class ExamComponent implements OnInit {
         return;
       }
 
-      this.api.getQuestionsBySubject(this.subjectId).subscribe(data => {
-        this.questions = data.map((q: any) => ({ ...q, selectedAnswer: '' }));
+      this.loadQuestions();
+    });
+  }
+
+  loadQuestions(): void {
+    this.loading = true;
+
+    this.api.getQuestionsBySubject(this.subjectId).subscribe({
+      next: (data: any[]) => {
+        console.log('📥 API Response:', data);
+        console.log('📊 Total:', data?.length);
+        console.log('🎯 subjectId:', this.subjectId, typeof this.subjectId);
+
+        if (!data || data.length === 0) {
+          alert('⚠️ No questions found for this subject!');
+          this.loading = false;
+          return;
+        }
+
+        // Normalize options (string → array)
+        this.questions = data.map((q: any) => {
+          let opts = q.options;
+          if (typeof opts === 'string') {
+            try { opts = JSON.parse(opts); } catch (e) { opts = []; }
+          }
+          if (!Array.isArray(opts)) opts = [];
+
+          return { ...q, options: opts, selectedAnswer: '' };
+        });
+
+        console.log('✅ Loaded questions:', this.questions.length);
+        this.loading = false;
         this.startTimer();
-      });
+      },
+      error: (err) => {
+        console.error('❌ Error:', err);
+        this.loading = false;
+        alert('Failed to load questions');
+      }
     });
   }
 
   startTimer(): void {
     this.countdown = 60;
+    clearInterval(this.timer);
     this.timer = setInterval(() => {
       this.countdown--;
-      if (this.countdown === 0) {
-        this.nextQuestion();
-      }
+      if (this.countdown <= 0) this.nextQuestion();
     }, 1000);
   }
 
   selectAnswer(option: string): void {
     this.questions[this.currentQuestionIndex].selectedAnswer = option;
-    this.nextQuestion();
+    setTimeout(() => this.nextQuestion(), 300);
   }
 
   nextQuestion(): void {
@@ -76,7 +111,9 @@ export class ExamComponent implements OnInit {
 
   submitExam(): void {
     clearInterval(this.timer);
-    this.score = this.questions.filter(q => q.selectedAnswer === q.correctAnswer).length;
+    this.score = this.questions.filter(
+      q => q.selectedAnswer === q.correctAnswer
+    ).length;
 
     const result = {
       studentName: this.studentName,
@@ -84,6 +121,7 @@ export class ExamComponent implements OnInit {
       subName: this.subName,
       score: this.score,
       total: this.questions.length,
+      date: new Date().toISOString(),
       answers: this.questions.map(q => ({
         question: q.questionText,
         selected: q.selectedAnswer,
@@ -95,5 +133,9 @@ export class ExamComponent implements OnInit {
       this.api.setResult(this.questions, this.score);
       this.submitted = true;
     });
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.timer);
   }
 }

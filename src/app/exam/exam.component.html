@@ -1,77 +1,154 @@
-<!-- Center Wrapper -->
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0F1020] to-[#1a1b2e]">
-  <!-- Card -->
-  <div class="w-full max-w-md p-6 border border-[#1f2937] rounded-2xl bg-[#111827] shadow-lg hover:shadow-2xl transition duration-300 font-sans">
+<!-- ============ MAIN WRAPPER ============ -->
+<div class="cyber-wrapper">
 
-    <!-- Mac Window Header -->
-    <div class="flex items-center gap-2 mb-6">
-      <span class="w-3 h-3 rounded-full bg-[#ff5f57]"></span>
-      <span class="w-3 h-3 rounded-full bg-[#ffbd2e]"></span>
-      <span class="w-3 h-3 rounded-full bg-[#28c941]"></span>
+  <!-- Animated Background Grid -->
+  <div class="grid-bg"></div>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <!-- ============ LOADING ============ -->
+  <div *ngIf="loading" class="cyber-card loading-card">
+    <div class="loader-ring">
+      <div></div><div></div><div></div><div></div>
     </div>
+    <p class="loading-text">INITIALIZING EXAM...</p>
+  </div>
 
-    <!-- Content Area -->
-    <div class="text-white font-['Tomorrow']">
+  <!-- ============ RESULT SCREEN ============ -->
+  <div *ngIf="submitted && !loading" class="cyber-card result-card">
+    <div class="result-glow"></div>
+    <div class="result-icon">🏆</div>
+    <h1 class="result-title">EXAM COMPLETE</h1>
+    <p class="result-sub">{{ studentName }}, your mission is accomplished</p>
 
-      <!-- Thank You Message -->
-      <div *ngIf="submitted" class="text-center">
-        <h2 class="text-3xl font-bold mb-3 text-[#39FF14]">🎉 Thank You!</h2>
-        <p class="text-sm text-[#B3FFB3] mb-5">Your exam was submitted successfully.</p>
-        <a routerLink="/login"
-           class="inline-block bg-[#39FF14] text-[#0F1020] font-semibold px-5 py-2 rounded-lg shadow hover:bg-[#00FF00] transition duration-200">
-          🔙 Back to Home
-        </a>
-      </div>
-
-      <!-- Exam Section -->
-      <div *ngIf="!submitted">
-        <h2 class="text-xl font-semibold mb-2">👋 Welcome, {{ studentName }}</h2>
-        <p class="text-sm text-gray-300 mb-4">⏱ Time Left: <strong class="text-red-400">{{ countdown }}</strong> seconds</p>
-
-        <!-- If there are questions -->
-        <div *ngIf="questions.length > 0">
-
-          <!-- Code Snippet Box -->
-          <div *ngIf="questions[currentQuestionIndex].text"
-               class="bg-[#1e1e1e] text-green-400 text-sm p-4 rounded-lg font-mono mb-4 overflow-auto whitespace-pre-wrap shadow-inner">
-            <pre>{{ questions[currentQuestionIndex].text }}</pre>
-          </div>
-
-          <!-- Question Text -->
-          <h3 class="text-base font-semibold mb-3">
-            {{ currentQuestionIndex + 1 }}. {{ questions[currentQuestionIndex].questionText }}
-          </h3>
-
-          <!-- Options List -->
-          <form class="space-y-3">
-            <div *ngFor="let option of questions[currentQuestionIndex].options" class="relative group">
-              <input
-                class="absolute opacity-0 peer"
-                type="radio"
-                [id]="option"
-                name="selectedOption"
-                [value]="option"
-                (change)="selectAnswer(option)"
-              />
-              <label
-                [attr.for]="option"
-                class="flex items-center gap-3 bg-[#1f2937] p-3 rounded-lg text-white border border-gray-600
-                       peer-checked:bg-[#b80000] peer-checked:border-[#ff1111]
-                       hover:bg-[#2a2e3d] cursor-pointer transition duration-200"
-              >
-                <span class="w-5 h-5 rounded-full border-2 border-white relative flex-shrink-0">
-                  <span
-                    class="absolute top-1/2 left-1/2 w-2.5 h-2.5 bg-[#ff1111] rounded-full transform -translate-x-1/2 -translate-y-1/2
-                           opacity-0 peer-checked:opacity-100"
-                  ></span>
-                </span>
-                <span class="text-sm font-medium">{{ option }}</span>
-              </label>
-            </div>
-          </form>
+    <div class="score-display">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="54"></circle>
+          <circle class="ring-fill" cx="60" cy="60" r="54"
+                  [style.stroke-dashoffset]="339 - (339 * score / questions.length)">
+          </circle>
+        </svg>
+        <div class="score-text">
+          <span class="score-num">{{ score }}</span>
+          <span class="score-total">/ {{ questions.length }}</span>
         </div>
       </div>
+      <p class="percentage">{{ (score / questions.length) * 100 | number:'1.0-0' }}%</p>
+    </div>
+
+    <div class="result-stats">
+      <div class="stat">
+        <span class="stat-label">CORRECT</span>
+        <span class="stat-value green">{{ score }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">WRONG</span>
+        <span class="stat-value red">{{ questions.length - score }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">TOTAL</span>
+        <span class="stat-value cyan">{{ questions.length }}</span>
+      </div>
+    </div>
+
+    <a routerLink="/login" class="cyber-btn">
+      <span>◄ BACK TO HOME</span>
+    </a>
+  </div>
+
+  <!-- ============ EXAM SCREEN ============ -->
+  <div *ngIf="!submitted && !loading && questions.length" class="cyber-card exam-card">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="terminal-dots">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+      </div>
+      <div class="terminal-title">
+        <span class="prompt">$</span> exam.{{ subName || 'subject' }}.js
+      </div>
+      <div class="student-badge">
+        <span class="pulse-dot"></span>
+        {{ studentName }}
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="progress-section">
+      <div class="progress-info">
+        <span class="q-counter">
+          <span class="q-current">{{ currentQuestionIndex + 1 }}</span>
+          <span class="q-sep">/</span>
+          <span class="q-total">{{ questions.length }}</span>
+        </span>
+        <span class="timer-badge" [class.danger]="countdown <= 10">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          {{ countdown }}s
+        </span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill"
+             [style.width.%]="((currentQuestionIndex + 1) / questions.length) * 100">
+        </div>
+        <div class="progress-glow"
+             [style.width.%]="((currentQuestionIndex + 1) / questions.length) * 100">
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Block -->
+    <div class="question-block" [@fadeSlide]>
+
+      <!-- Code Snippet (optional) -->
+      <div *ngIf="questions[currentQuestionIndex].text &&
+                  questions[currentQuestionIndex].text !== questions[currentQuestionIndex].questionText"
+           class="code-snippet">
+        <div class="code-header">
+          <span class="code-lang">javascript</span>
+        </div>
+        <pre><code>{{ questions[currentQuestionIndex].text }}</code></pre>
+      </div>
+
+      <!-- Question Title -->
+      <h2 class="question-title">
+        <span class="q-badge">Q{{ currentQuestionIndex + 1 }}</span>
+        {{ questions[currentQuestionIndex].questionText }}
+      </h2>
+
+      <!-- Options Grid -->
+      <div class="options-grid">
+        <button
+          *ngFor="let option of questions[currentQuestionIndex].options; let i = index"
+          type="button"
+          class="cyber-option"
+          [class.selected]="questions[currentQuestionIndex].selectedAnswer === option"
+          (click)="selectAnswer(option)">
+
+          <span class="option-key">{{ ['A','B','C','D'][i] }}</span>
+          <span class="option-text">{{ option }}</span>
+          <span class="option-check">✓</span>
+          <span class="option-glow"></span>
+        </button>
+      </div>
 
     </div>
+
   </div>
+
+  <!-- ============ NO QUESTIONS ============ -->
+  <div *ngIf="!submitted && !loading && !questions.length" class="cyber-card empty-card">
+    <div class="empty-icon">⚠️</div>
+    <h2>NO QUESTIONS FOUND</h2>
+    <p>This subject has no questions yet.</p>
+    <a routerLink="/login" class="cyber-btn">
+      <span>◄ GO BACK</span>
+    </a>
+  </div>
+
 </div>
