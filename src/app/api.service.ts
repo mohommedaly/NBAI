@@ -7,11 +7,12 @@ export interface Question {
   questionText: string;
   options: string[];
   correctAnswer: string;
-  type: string;
+  type: string;              // 'MCQ' | 'True/False' | 'Short' | 'Long' | 'Fill'
   difficulty: string;
   subjectId: string;
   text: string;
   answer: string;
+  blanks?: string[];         // 👈 NEW — Fill type ke liye
 }
 
 export interface Subject {
@@ -62,7 +63,6 @@ export class ApiService {
     const url = `${this.baseUrl}?${httpParams.toString()}`;
 
     if (body) {
-      // ✅ CORS-safe POST — text/plain bhejta hai (no preflight)
       return this.http.post(url, JSON.stringify(body), {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' }
       });

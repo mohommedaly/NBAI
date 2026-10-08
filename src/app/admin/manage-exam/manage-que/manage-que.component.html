@@ -1,144 +1,363 @@
-<section class="bg-white p-6 rounded shadow mb-10">
-  <h2 class="text-xl font-semibold mb-4">
-    Question Management - {{ subject.subjectName }}
-  </h2>
+<div class="space-y-6">
+  <!-- Toast Notification -->
+  <div *ngIf="notification" 
+       class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium flex items-center gap-2 animate-fade-in"
+       [ngClass]="notification.type === 'success' ? 'bg-slate-900 text-white border-slate-800' : 'bg-rose-600 text-white border-rose-700'">
+    <i [class]="notification.type === 'success' ? 'fas fa-circle-check text-emerald-400' : 'fas fa-triangle-exclamation text-amber-300'"></i>
+    <span>{{ notification.message }}</span>
+  </div>
 
-  <form #form="ngForm" (ngSubmit)="addQuestion()" novalidate class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <!-- Question Text -->
-    <input type="text" placeholder="Question Text" class="border p-2 rounded"
-           [(ngModel)]="questionText" name="questionText" required />
-
-    <!-- Question Type -->
-    <select class="border p-2 rounded" [(ngModel)]="questionType" name="questionType" required>
-      <option disabled value="">Type</option>
-      <option>MCQ</option>
-      <option>True/False</option>
-      <option>Short</option>
-      <option>Long</option>
-    </select>
-
-    <!-- Difficulty -->
-    <select class="border p-2 rounded" [(ngModel)]="difficulty" name="difficulty" required>
-      <option disabled value="">Difficulty</option>
-      <option>Easy</option>
-      <option>Medium</option>
-      <option>Hard</option>
-    </select>
-
-    <!-- Code Snippet -->
-    <textarea placeholder="Enter code snippet (optional)" class="border p-2 rounded font-mono text-sm md:col-span-2"
-              [(ngModel)]="codeText" name="codeSnippet" rows="5"></textarea>
-
-    <!-- MCQ Options -->
-    <div *ngIf="questionType === 'MCQ'" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- Header & Tab Navigation -->
+  <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <label for="option1">Option 1:</label>
-        <input id="option1" type="text" class="border p-2 rounded"
-               [(ngModel)]="options[0]" name="option1" required />
+        <h2 class="text-lg font-bold text-slate-900">Question Management</h2>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Managing question bank for <span class="font-medium text-slate-800">{{ subject?.subjectName }}</span> ({{ currentQuestions.length }} questions)
+        </p>
       </div>
-      <div>
-        <label for="option2">Option 2:</label>
-        <input id="option2" type="text" class="border p-2 rounded"
-               [(ngModel)]="options[1]" name="option2" required />
-      </div>
-      <div>
-        <label for="option3">Option 3:</label>
-        <input id="option3" type="text" class="border p-2 rounded"
-               [(ngModel)]="options[2]" name="option3" required />
-      </div>
-      <div>
-        <label for="option4">Option 4:</label>
-        <input id="option4" type="text" class="border p-2 rounded"
-               [(ngModel)]="options[3]" name="option4" required />
+
+      <!-- Navigation Tabs -->
+      <div class="inline-flex p-1 bg-slate-100 rounded-lg text-xs font-medium text-slate-600 self-start sm:self-auto">
+        <button (click)="activeTab = 'manual'"
+                [ngClass]="activeTab === 'manual' ? 'bg-white text-slate-900 shadow-sm' : 'hover:text-slate-900'"
+                class="px-3 py-1.5 rounded-md transition flex items-center gap-1.5">
+          <i class="fas fa-pen-to-square text-[11px]"></i>
+          <span>Add Question</span>
+        </button>
+        <button (click)="activeTab = 'bulk'"
+                [ngClass]="activeTab === 'bulk' ? 'bg-white text-slate-900 shadow-sm' : 'hover:text-slate-900'"
+                class="px-3 py-1.5 rounded-md transition flex items-center gap-1.5">
+          <i class="fas fa-file-import text-[11px]"></i>
+          <span>Bulk Import</span>
+        </button>
+        <button (click)="activeTab = 'list'"
+                [ngClass]="activeTab === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'hover:text-slate-900'"
+                class="px-3 py-1.5 rounded-md transition flex items-center gap-1.5">
+          <i class="fas fa-database text-[11px]"></i>
+          <span>Question Bank ({{ currentQuestions.length }})</span>
+        </button>
       </div>
     </div>
+  </div>
 
-    <!-- Correct Answer -->
-    <input type="text" placeholder="Correct Answer" class="border p-2 rounded"
-           [(ngModel)]="correctAnswer" name="correctAnswer" required />
+  <!-- TAB 1: MANUAL ADD QUESTION -->
+  <div *ngIf="activeTab === 'manual'" class="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm animate-fade-in">
+    <div class="mb-5 pb-3 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Create New Question</h3>
+      <span class="text-xs text-slate-400">Step 1: Fill in question details</span>
+    </div>
 
-    <!-- Submit Button -->
-    <div class="flex gap-4 mt-2 md:col-span-2">
-      <button type="submit"
-              [disabled]="!form.valid"
-              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50">
-        Add Question
+    <form #form="ngForm" (ngSubmit)="questionType === 'Fill' ? addFillQuestion() : addQuestion()" class="space-y-4">
+      
+      <!-- Row 1: Question Type & Difficulty -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Question Format</label>
+          <select [(ngModel)]="questionType" 
+                  name="questionType" 
+                  required
+                  class="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 bg-white">
+            <option value="MCQ">Multiple Choice (MCQ)</option>
+            <option value="True/False">True / False</option>
+            <option value="Fill">Fill in the Blanks</option>
+            <option value="Short">Short Answer</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Difficulty Level</label>
+          <select [(ngModel)]="difficulty" 
+                  name="difficulty" 
+                  required
+                  class="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 bg-white">
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Question Prompt -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Question Title / Prompt</label>
+        <input type="text" 
+               [(ngModel)]="questionText" 
+               name="questionText" 
+               placeholder="e.g. What is the output of the following function?"
+               required
+               class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900" />
+      </div>
+
+      <!-- Code Snippet (Optional for non-Fill) -->
+      <div *ngIf="questionType !== 'Fill'">
+        <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+          Code Snippet <span class="text-slate-400 font-normal">(Optional)</span>
+        </label>
+        <textarea [(ngModel)]="codeText" 
+                  name="codeSnippet" 
+                  rows="4"
+                  placeholder="function test() { console.log('hello'); }"
+                  class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 bg-slate-50/50"></textarea>
+      </div>
+
+      <!-- MCQ Options -->
+      <div *ngIf="questionType === 'MCQ'" class="space-y-3 pt-2">
+        <label class="block text-xs font-semibold text-slate-700">Answer Options & Correct Answer</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div *ngFor="let opt of [0,1,2,3]; let i = index" class="relative">
+            <span class="absolute left-3 top-2.5 text-xs font-bold text-slate-400">
+              {{ ['A','B','C','D'][i] }}
+            </span>
+            <input type="text" 
+                   [(ngModel)]="options[i]" 
+                   [name]="'option' + i" 
+                   [placeholder]="'Option ' + ['A','B','C','D'][i]"
+                   required
+                   class="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Select Correct Answer</label>
+          <select [(ngModel)]="correctAnswer" 
+                  name="correctAnswer" 
+                  required
+                  class="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 bg-white">
+            <option value="" disabled>Choose the matching correct option...</option>
+            <option *ngFor="let opt of options; let i = index" [value]="opt" [disabled]="!opt">
+              Option {{ ['A','B','C','D'][i] }}: {{ opt || '(Enter option text above)' }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- True/False Correct Answer -->
+      <div *ngIf="questionType === 'True/False'" class="pt-2">
+        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Correct Answer</label>
+        <div class="flex items-center gap-4">
+          <label class="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+            <input type="radio" [(ngModel)]="correctAnswer" name="tfAnswer" value="True" class="text-slate-900 focus:ring-slate-900" />
+            <span>True</span>
+          </label>
+          <label class="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+            <input type="radio" [(ngModel)]="correctAnswer" name="tfAnswer" value="False" class="text-slate-900 focus:ring-slate-900" />
+            <span>False</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Short Answer -->
+      <div *ngIf="questionType === 'Short'" class="pt-2">
+        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Expected Correct Answer</label>
+        <input type="text" 
+               [(ngModel)]="correctAnswer" 
+               name="shortAnswer" 
+               placeholder="Exact answer expected..."
+               required
+               class="w-full px-3.5 py-2 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900" />
+      </div>
+
+      <!-- FILL IN THE BLANKS -->
+      <div *ngIf="questionType === 'Fill'" class="space-y-4 pt-2">
+        <div class="p-4 rounded-lg bg-amber-50/70 border border-amber-200/70">
+          <div class="flex items-center gap-2 text-xs font-semibold text-amber-800 mb-2">
+            <i class="fas fa-lightbulb"></i>
+            <span>Fill in the Blanks Setup</span>
+          </div>
+          <p class="text-xs text-amber-700 mb-3">
+            Use <code class="font-mono bg-amber-100 px-1 py-0.5 rounded font-bold">___</code> (three underscores) for every blank in your code snippet.
+          </p>
+
+          <textarea [(ngModel)]="fillCode" 
+                    name="fillCode" 
+                    rows="6"
+                    (ngModelChange)="onFillCodeChange()"
+                    placeholder="function sum(a, b) {&#10;  ___ a + b;&#10;}"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-amber-200 text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 bg-white"></textarea>
+
+          <div *ngIf="getBlankCount() > 0" class="mt-4 space-y-2">
+            <div class="text-xs font-semibold text-slate-700">
+              Blanks Detected: <span class="text-indigo-600 font-bold">{{ getBlankCount() }}</span>
+            </div>
+            <div *ngFor="let ans of fillAnswers; let i = index" class="flex items-center gap-2">
+              <span class="text-xs font-medium text-slate-500 w-20">Blank #{{ i + 1 }}:</span>
+              <input type="text" 
+                     [(ngModel)]="fillAnswers[i]" 
+                     [name]="'fillAns' + i" 
+                     placeholder="Correct keyword for blank"
+                     class="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit / Reset Actions -->
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+        <button type="button" 
+                (click)="resetForm()"
+                class="px-4 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 transition">
+          Reset
+        </button>
+        <button type="submit" 
+                [disabled]="isSaving"
+                class="px-4 py-2 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 disabled:opacity-50 transition inline-flex items-center gap-2">
+          <i *ngIf="isSaving" class="fas fa-spinner fa-spin text-xs"></i>
+          <i *ngIf="!isSaving" class="fas fa-plus text-xs"></i>
+          <span>Save Question</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- TAB 2: BULK IMPORT -->
+  <div *ngIf="activeTab === 'bulk'" class="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm animate-fade-in space-y-4">
+    <div class="mb-2 pb-3 border-b border-slate-100">
+      <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Bulk Import MCQs</h3>
+      <p class="text-xs text-slate-500 mt-1">Paste formatted questions or upload a text file.</p>
+    </div>
+
+    <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 font-mono space-y-1">
+      <div class="font-bold text-slate-700">Expected 6-line pattern per MCQ:</div>
+      <div>Line 1: Question text</div>
+      <div>Line 2: Option A</div>
+      <div>Line 3: Option B</div>
+      <div>Line 4: Option C</div>
+      <div>Line 5: Option D</div>
+      <div>Line 6: Correct Answer (Exact match with one of the options)</div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-semibold text-slate-700 mb-1.5">Paste Questions Text</label>
+      <textarea [(ngModel)]="bulkText" 
+                rows="8"
+                placeholder="What is 2 + 2?&#10;1&#10;2&#10;3&#10;4&#10;4"
+                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"></textarea>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
+      <div>
+        <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 cursor-pointer transition">
+          <i class="fas fa-file-arrow-up text-slate-500"></i>
+          <span>{{ bulkFileName || 'Choose .txt / .csv file' }}</span>
+          <input type="file" accept=".txt,.csv" (change)="onBulkFileChange($event)" class="hidden" />
+        </label>
+      </div>
+
+      <button (click)="submitBulkQuestions()"
+              [disabled]="isSaving || !bulkText.trim()"
+              class="px-4 py-2 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 disabled:opacity-50 transition inline-flex items-center gap-2">
+        <i *ngIf="isSaving" class="fas fa-spinner fa-spin text-xs"></i>
+        <i *ngIf="!isSaving" class="fas fa-cloud-arrow-up text-xs"></i>
+        <span>Import Questions</span>
       </button>
     </div>
-  </form>
-
-  <!-- Bulk MCQ Upload Section -->
-  <div class="bg-gray-50 border p-4 rounded mb-6">
-    <h3 class="text-md font-semibold mb-2">Bulk Add MCQs</h3>
-
-    <textarea class="border p-2 rounded w-full mb-2" rows="6"
-              [(ngModel)]="bulkText" name="bulkText"
-              placeholder="Paste MCQs here. Each question should follow this pattern:
-Question line
-Option 1
-Option 2
-Option 3
-Option 4
-Correct Answer"></textarea>
-
-    <input type="file" accept=".txt,.csv" (change)="onBulkFileChange($event)" class="mb-2" />
-
-    <button (click)="submitBulkQuestions()"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      Submit Bulk MCQs
-    </button>
   </div>
 
-  <!-- Preview Questions Table -->
-  <div class="overflow-x-auto mt-4">
-    <h3 class="font-semibold mb-2">Preview Added Questions</h3>
-
-    <table class="min-w-full text-sm border" *ngIf="currentQuestions.length > 0; else noQuestions">
-      <thead>
-        <tr class="bg-gray-100">
-          <th class="p-2 border">Question</th>
-          <th class="p-2 border">Type</th>
-          <th class="p-2 border">Difficulty</th>
-          <th class="p-2 border">Answer</th>
-          <th class="p-2 border">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let q of currentQuestions">
-          <td class="p-2 border">{{ q.questionText }}</td>
-          <td class="p-2 border">{{ q.type }}</td>
-          <td class="p-2 border">{{ q.difficulty }}</td>
-          <td class="p-2 border">{{ q.correctAnswer }}</td>
-          <td class="p-2 border text-center">
-            <button (click)="openDeleteConfirmDialog(q)" class="text-red-600 hover:text-red-800">
-              Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <ng-template #noQuestions>
-      <p class="text-gray-500">No questions added for this subject yet.</p>
-    </ng-template>
-  </div>
-
-  <!-- Delete Confirmation Modal -->
-  <div *ngIf="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded shadow-lg p-6 w-80 text-center">
-      <h3 class="text-lg font-semibold mb-4">
-        <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
-        Delete question?
-      </h3>
-      <p class="text-gray-600 mb-6">This action cannot be undone.</p>
-      <div class="flex justify-center gap-4">
-        <button (click)="cancelDelete()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
-          Cancel
-        </button>
-        <button (click)="confirmDelete()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
-          Delete
-        </button>
+  <!-- TAB 3: QUESTION BANK PREVIEW -->
+  <div *ngIf="activeTab === 'list'" class="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm animate-fade-in">
+    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+      <div>
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Question Bank</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Total {{ currentQuestions.length }} questions registered</p>
       </div>
+      <button (click)="loadQuestionsForSubject()" 
+              title="Refresh Questions"
+              class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition">
+        <i class="fas fa-rotate text-xs"></i>
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="currentQuestions.length === 0" class="text-center py-12 text-slate-400">
+      <i class="fas fa-file-circle-question text-3xl mb-2 text-slate-300"></i>
+      <p class="text-sm font-medium text-slate-700">No questions added yet</p>
+      <p class="text-xs text-slate-400 mt-1 mb-4">Use the "Add Question" tab above to create questions.</p>
+      <button (click)="activeTab = 'manual'" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800">
+        Create Question
+      </button>
+    </div>
+
+    <!-- Questions Table -->
+    <div *ngIf="currentQuestions.length > 0" class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th class="pb-3 w-10">#</th>
+            <th class="pb-3">Question</th>
+            <th class="pb-3 w-28">Type</th>
+            <th class="pb-3 w-24">Difficulty</th>
+            <th class="pb-3 w-40">Correct Answer</th>
+            <th class="pb-3 w-16 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs">
+          <tr *ngFor="let q of currentQuestions; let i = index" class="hover:bg-slate-50/70 transition">
+            <td class="py-3 text-slate-400 font-medium">{{ i + 1 }}</td>
+            <td class="py-3 pr-4">
+              <div class="font-medium text-slate-900 text-sm">{{ q.questionText }}</div>
+              <div *ngIf="q.text" class="text-[11px] font-mono text-slate-500 bg-slate-50 px-2 py-1 rounded mt-1 max-w-md truncate">
+                {{ q.text }}
+              </div>
+            </td>
+            <td class="py-3">
+              <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold"
+                    [ngClass]="{
+                      'bg-indigo-50 text-indigo-700': q.type === 'MCQ',
+                      'bg-amber-50 text-amber-700': q.type === 'Fill',
+                      'bg-emerald-50 text-emerald-700': q.type === 'True/False',
+                      'bg-slate-100 text-slate-700': !q.type || q.type === 'Short'
+                    }">
+                {{ q.type || 'MCQ' }}
+              </span>
+            </td>
+            <td class="py-3">
+              <span class="inline-block px-2 py-0.5 rounded text-[11px] font-medium"
+                    [ngClass]="{
+                      'bg-emerald-50 text-emerald-700': q.difficulty === 'Easy',
+                      'bg-amber-50 text-amber-700': q.difficulty === 'Medium',
+                      'bg-rose-50 text-rose-700': q.difficulty === 'Hard'
+                    }">
+                {{ q.difficulty || 'Medium' }}
+              </span>
+            </td>
+            <td class="py-3 font-mono text-slate-700 truncate max-w-xs">
+              {{ q.type === 'Fill' && q.blanks ? q.blanks.join(' | ') : q.correctAnswer }}
+            </td>
+            <td class="py-3 text-right">
+              <button (click)="openDeleteConfirmDialog(q)" 
+                      title="Delete Question"
+                      class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition">
+                <i class="fas fa-trash-can text-xs"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-</section>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="showDeleteConfirm" 
+     class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+  <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 border border-slate-200 text-center">
+    <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3">
+      <i class="fas fa-trash-can text-lg"></i>
+    </div>
+    <h3 class="text-base font-bold text-slate-900">Delete Question?</h3>
+    <p class="text-xs text-slate-500 mt-1 mb-5">
+      Are you sure you want to permanently remove this question from the bank?
+    </p>
+    <div class="flex items-center justify-center gap-3">
+      <button (click)="cancelDelete()" 
+              class="px-4 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 transition">
+        Cancel
+      </button>
+      <button (click)="confirmDelete()" 
+              class="px-4 py-2 rounded-lg bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 transition">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>

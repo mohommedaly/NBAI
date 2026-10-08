@@ -1,12 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ApiService, Question } from '../../../api.service';   // 👈 service se import
-
-// ❌ Local interface HATA DO — ye clash kar raha tha
-// interface Question {
-//   id?: string;
-//   questionText: string;
-//   ...
-// }
+import { ApiService, Question } from '../../../api.service';
 
 @Component({
   selector: 'app-manage-que',
@@ -14,12 +7,15 @@ import { ApiService, Question } from '../../../api.service';   // 👈 service s
   styleUrls: ['./manage-que.component.scss']
 })
 export class ManageQueComponent implements OnChanges {
-
   @Input() subject: any;
 
+  activeTab: 'manual' | 'bulk' | 'list' = 'manual';
+  isLoading = false;
+  isSaving = false;
+
   questionText = '';
-  questionType = '';
-  difficulty = '';
+  questionType = 'MCQ';
+  difficulty = 'Medium';
   correctAnswer = '';
   codeText = '';
   options: string[] = ['', '', '', ''];
@@ -28,101 +24,184 @@ export class ManageQueComponent implements OnChanges {
   questionToDelete!: Question;
 
   bulkText: string = '';
-  bulkFileError: string = '';
   bulkFileName: string = '';
+
+  // Fill in blanks
+  fillCode = '';
+  fillAnswers: string[] = [''];
+
+  notification: { message: string; type: 'success' | 'error' } | null = null;
 
   constructor(private api: ApiService) {}
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['subject'] && this.subject) {
       this.resetForm();
       this.loadQuestionsForSubject();
     }
   }
 
-  loadQuestionsForSubject() {
+  showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.notification = { message, type };
+    setTimeout(() => {
+      this.notification = null;
+    }, 4000);
+  }
+
+  loadQuestionsForSubject(): void {
     if (this.subject?.id) {
-      this.api.getQuestionsBySubject(this.subject.id).subscribe(
-        (questions: Question[]) => {
-          this.currentQuestions = questions ?? [];
-          console.log('Fetched questions for subject:', this.currentQuestions);
+      this.isLoading = true;
+      this.api.getQuestionsBySubject(this.subject.id).subscribe({
+        next: (questions: Question[]) => {
+          this.currentQuestions = (questions ?? []).map((q: any) => {
+            if (q.blanks && typeof q.blanks === 'string') {
+              try { q.blanks = JSON.parse(q.blanks); } catch { q.blanks = []; }
+            }
+            if (q.options && typeof q.options === 'string') {
+              try { q.options = JSON.parse(q.options); } catch { q.options = []; }
+            }
+            return q;
+          });
+          this.isLoading = false;
         },
-        (error: any) => {
+        error: (error: any) => {
           console.error('Error fetching questions:', error);
+          this.isLoading = false;
         }
-      );
+      });
     }
   }
 
-  addQuestion() {
+  addQuestion(): void {
     if (!this.subject?.id) return;
+    this.isSaving = true;
 
     const question: Question = {
       questionText: this.questionText,
-      options: this.options,
+      options: this.questionType === 'MCQ' ? this.options : (this.questionType === 'True/False' ? ['True', 'False'] : []),
       correctAnswer: this.correctAnswer,
       type: this.questionType,
       difficulty: this.difficulty,
       subjectId: this.subject.id,
       text: this.codeText,
       answer: ''
-      // 👈 id mat do — service auto-generate karegi
     };
 
-    this.api.addQuestion(question).subscribe(
-      (response: any) => {
-        console.log('Question added successfully:', response);
+    this.api.addQuestion(question).subscribe({
+      next: () => {
         this.loadQuestionsForSubject();
         this.resetForm();
+        this.isSaving = false;
+        this.showToast('Question added successfully!');
       },
-      (error: any) => {
+      error: (error: any) => {
         console.error('Error adding question:', error);
+        this.isSaving = false;
+        this.showToast('Failed to add question', 'error');
       }
-    );
+    });
   }
 
-  resetForm() {
+  getBlankCount(): number {
+    if (!this.fillCode) return 0;
+    const matches = this.fillCode.match(/___+/g);
+    return matches ? matches.length : 0;
+  }
+
+  onFillCodeChange(): void {
+    const count = this.getBlankCount();
+    while (this.fillAnswers.length < count) this.fillAnswers.push('');
+    this.fillAnswers = this.fillAnswers.slice(0, count);
+  }
+
+  addFillQuestion(): void {
+    if (!this.subject?.id) return;
+
+    if (!this.fillCode.trim()) {
+      this.showToast('Please enter code snippet with ___ blanks', 'error');
+      return;
+    }
+
+    const count = this.getBlankCount();
+    if (count === 0) {
+      this.showToast('Include at least one ___ blank in code', 'error');
+      return;
+    }
+
+    if (this.fillAnswers.some(a => !a || !a.trim())) {
+      this.showToast('Fill in all answers for blanks', 'error');
+      return;
+    }
+
+    this.isSaving = true;
+    const question: Question = {
+      questionText: this.questionText || 'Fill in the blanks in code snippet',
+      options: [],
+      correctAnswer: this.fillAnswers.join('|'),
+      type: 'Fill',
+      difficulty: this.difficulty || 'Medium',
+      subjectId: this.subject.id,
+      text: this.fillCode,
+      answer: '',
+      blanks: [...this.fillAnswers]
+    };
+
+    this.api.addQuestion(question).subscribe({
+      next: () => {
+        this.loadQuestionsForSubject();
+        this.resetForm();
+        this.isSaving = false;
+        this.showToast('Fill-in question added successfully!');
+      },
+      error: (error: any) => {
+        console.error('Error adding fill question:', error);
+        this.isSaving = false;
+        this.showToast('Failed to add question', 'error');
+      }
+    });
+  }
+
+  resetForm(): void {
     this.questionText = '';
-    this.questionType = '';
-    this.difficulty = '';
+    this.questionType = 'MCQ';
+    this.difficulty = 'Medium';
     this.correctAnswer = '';
     this.codeText = '';
     this.options = ['', '', '', ''];
+    this.fillCode = '';
+    this.fillAnswers = [''];
   }
 
-  openDeleteConfirmDialog(question: Question) {
+  openDeleteConfirmDialog(question: Question): void {
     this.questionToDelete = question;
     this.showDeleteConfirm = true;
   }
 
-  cancelDelete() {
+  cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.questionToDelete = undefined!;
   }
 
-  confirmDelete() {
+  confirmDelete(): void {
     const questionId = this.questionToDelete?.id;
-
     if (!questionId) return;
 
-    this.api.deleteQuestion(questionId).subscribe(
-      () => {
+    this.api.deleteQuestion(questionId).subscribe({
+      next: () => {
         this.currentQuestions = this.currentQuestions.filter(q => q.id !== questionId);
         this.showDeleteConfirm = false;
         this.questionToDelete = undefined!;
+        this.showToast('Question deleted successfully');
       },
-      (error) => {
+      error: (error) => {
         console.error('Error deleting question:', error);
         this.showDeleteConfirm = false;
+        this.showToast('Failed to delete question', 'error');
       }
-    );
+    });
   }
 
-  handleBulkTextChange(event: any) {
-    this.bulkText = event.target.value;
-  }
-
-  onBulkFileChange(event: any) {
+  onBulkFileChange(event: any): void {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -146,7 +225,6 @@ export class ManageQueComponent implements OnChanges {
       if (options.length < 4 || !answerLine) break;
 
       questions.push({
-        // 👈 id mat do — service auto-generate karegi
         questionText: questionLine,
         options,
         correctAnswer: answerLine,
@@ -159,34 +237,35 @@ export class ManageQueComponent implements OnChanges {
 
       i += 6;
     }
-
     return questions;
   }
 
-  submitBulkQuestions() {
+  submitBulkQuestions(): void {
     if (!this.bulkText.trim()) {
-      alert('Please paste or upload MCQ data.');
+      this.showToast('Please enter or upload bulk MCQ text', 'error');
       return;
     }
 
     const questions = this.parseBulkQuestions();
     if (questions.length === 0) {
-      alert('No valid questions found. Please check your input format.');
+      this.showToast('No valid MCQs parsed. Please verify the format.', 'error');
       return;
     }
 
-    this.api.addBulkQuestions(questions).subscribe(
-      res => {
-        console.log('Bulk questions added successfully:', res);
+    this.isSaving = true;
+    this.api.addBulkQuestions(questions).subscribe({
+      next: () => {
         this.bulkText = '';
         this.bulkFileName = '';
         this.loadQuestionsForSubject();
-        alert(`${questions.length} questions added successfully.`);
+        this.isSaving = false;
+        this.showToast(`${questions.length} questions imported successfully!`);
       },
-      err => {
+      error: (err) => {
         console.error('Error adding bulk questions:', err);
-        alert('Failed to upload bulk questions.');
+        this.isSaving = false;
+        this.showToast('Failed to import bulk questions', 'error');
       }
-    );
+    });
   }
 }

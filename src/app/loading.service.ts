@@ -12,13 +12,19 @@ export class LoadingService {
 
   show(): void {
     this.requestCount++;
-    this._loading.next(true);
+    Promise.resolve().then(() => {
+      if (this.requestCount > 0 && !this._loading.value) {
+        this._loading.next(true);
+      }
+    });
   }
 
   hide(): void {
-    this.requestCount--;
-    if (this.requestCount === 0) {
-      this._loading.next(false);
-    }
+    this.requestCount = Math.max(0, this.requestCount - 1);
+    Promise.resolve().then(() => {
+      if (this.requestCount === 0 && this._loading.value) {
+        this._loading.next(false);
+      }
+    });
   }
 }

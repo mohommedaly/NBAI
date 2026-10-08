@@ -5,9 +5,16 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { ManageExamComponent } from './manage-exam/manage-exam.component';
 import { ResultComponent } from './result/result.component';
 
-const routes: Routes = [{ path: '', component: AdminDashboardComponent },
-  { path: 'manageexam', component: ManageExamComponent},
-  { path: 'result', component: ResultComponent}
+const routes: Routes = [
+  {
+    path: '',
+    component: AdminComponent,
+    children: [
+      { path: '', component: AdminDashboardComponent },
+      { path: 'manageexam', component: ManageExamComponent },
+      { path: 'result', component: ResultComponent }
+    ]
+  }
 ];
 
 @NgModule({

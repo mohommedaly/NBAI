@@ -1,65 +1,107 @@
-<!-- Sidebar Toggle Button (Visible on Mobile Only) -->
-<button (click)="toggleSidebar()" class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
-  <span class="sr-only">Open sidebar</span>
-  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-    <path fill-rule="evenodd" clip-rule="evenodd"
-      d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
-    </path>
-  </svg>
-</button>
-
-<!-- Sidebar -->
-<aside [ngClass]="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
-  class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0 bg-primary text-white"
-  aria-label="Sidebar">
-  
-  <!-- Close Button -->
-  <button (click)="toggleSidebar()" class="absolute top-4 right-4 text-white text-2xl">
-    &times; <!-- The "×" character for close -->
+<!-- Mobile Top Header Bar -->
+<div class="sm:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-2.5">
+    <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white font-bold text-sm">
+      N
+    </div>
+    <span class="font-semibold text-slate-900 tracking-tight text-base">NBAI Admin</span>
+  </div>
+  <button (click)="toggleSidebar()" 
+          class="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition focus:outline-none"
+          aria-label="Toggle Navigation">
+    <i class="fas fa-bars text-lg"></i>
   </button>
+</div>
 
-  <div class="h-full px-3 py-4 overflow-y-auto">
-    <a href="#" class="flex items-center ps- mb-5">
-      <img src="../../../assets/images/image.png" class="h-16 w-16 me-3 rounded-full object-cover" alt="Logo" />
-      <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">NBAI</span>
-    </a>
+<!-- Mobile Backdrop -->
+<div *ngIf="sidebarOpen" 
+     (click)="closeSidebar()"
+     class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 sm:hidden transition-opacity">
+</div>
 
-    <ul class="space-y-2 font-medium">
-      <!-- Dashboard -->
-      <li>
-        <a routerLink="/admin1" class="flex items-center p-2 rounded-lg hover:text-gray-100 dark:hover:bg-gray-700 group">
-          <span class="ms-3">Dashboard</span>
-        </a>
-      </li>
+<!-- Minimalist Sidebar -->
+<aside [ngClass]="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
+       class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform duration-300 ease-in-out sm:translate-x-0 bg-white border-r border-slate-200 flex flex-col justify-between"
+       aria-label="Sidebar">
   
-      <!-- Teachers -->
-      <li>
-        <a routerLink="manageexam" class="flex items-center p-2 rounded-lg hover:text-gray-100 dark:hover:bg-gray-700 group">
-          <span class="ms-3">Manage Exam</span>
+  <div class="h-full flex flex-col justify-between py-6 px-4">
+    <div>
+      <!-- Brand Logo / Header -->
+      <div class="flex items-center justify-between px-2 mb-8">
+        <a routerLink="/admin" class="flex items-center gap-3 group">
+          <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-base shadow-sm group-hover:bg-slate-800 transition">
+            <i class="fas fa-layer-group text-sm"></i>
+          </div>
+          <div>
+            <div class="font-bold text-slate-900 tracking-tight text-base leading-none">NBAI</div>
+            <div class="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-wider">Exam System</div>
+          </div>
         </a>
-      </li>
-  
-      <!-- Result -->
-      <li>
-        <a routerLink="result" class="flex items-center p-2 rounded-lg hover:text-gray-100 group">
-          <span class="ms-3">Result</span>
+        <button (click)="closeSidebar()" class="sm:hidden text-slate-400 hover:text-slate-600 p-1.5 rounded-lg">
+          <i class="fas fa-times text-base"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="px-2 mb-2 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Menu</div>
+      <nav class="space-y-1">
+        <!-- Dashboard -->
+        <a routerLink="/admin" 
+           [routerLinkActiveOptions]="{exact: true}"
+           routerLinkActive="bg-slate-900 text-white shadow-sm font-medium"
+           (click)="closeSidebar()"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors">
+          <i class="fas fa-chart-pie w-5 text-center text-sm"></i>
+          <span>Dashboard</span>
         </a>
-      </li>
-  
-      <!-- Exam Management -->
-      <li>
-        <a href="#" class="flex items-center p-2 rounded-lg hover:text-gray-100 dark:hover:bg-gray-700 group">
-          <span class="ms-3">Teachers</span>
+
+        <!-- Manage Exam -->
+        <a routerLink="/admin/manageexam" 
+           routerLinkActive="bg-slate-900 text-white shadow-sm font-medium"
+           (click)="closeSidebar()"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors">
+          <i class="fas fa-file-pen w-5 text-center text-sm"></i>
+          <span>Manage Exams</span>
         </a>
-      </li>
-  
-      <!-- Logout -->
-      <li class="mt-5">
-        <a href="#" class="flex items-center p-2 rounded-lg text-red-500 hover:text-white dark:hover:bg-gray-700 group">
-          <span class="ms-3">Logout</span>
+
+        <!-- Result -->
+        <a routerLink="/admin/result" 
+           routerLinkActive="bg-slate-900 text-white shadow-sm font-medium"
+           (click)="closeSidebar()"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors">
+          <i class="fas fa-square-poll-vertical w-5 text-center text-sm"></i>
+          <span>Student Results</span>
         </a>
-      </li>
-    </ul>
+
+        <!-- Student Portal Quick Switch -->
+        <a routerLink="/login" 
+           (click)="closeSidebar()"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors">
+          <i class="fas fa-user-graduate w-5 text-center text-sm"></i>
+          <span>Student Portal</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Bottom Profile & Logout Section -->
+    <div class="pt-4 border-t border-slate-100">
+      <div class="flex items-center justify-between px-2 py-2">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-medium text-xs">
+            AD
+          </div>
+          <div class="overflow-hidden">
+            <div class="text-xs font-semibold text-slate-800 truncate">Administrator</div>
+            <div class="text-[10px] text-slate-400 truncate">admin&#64;nbai.edu</div>
+          </div>
+        </div>
+        <a routerLink="/login" 
+           title="Sign Out"
+           class="p-2 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
+           (click)="closeSidebar()">
+          <i class="fas fa-arrow-right-from-bracket text-sm"></i>
+        </a>
+      </div>
+    </div>
   </div>
 </aside>
-

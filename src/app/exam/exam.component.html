@@ -1,154 +1,276 @@
-<!-- ============ MAIN WRAPPER ============ -->
-<div class="cyber-wrapper">
-
-  <!-- Animated Background Grid -->
-  <div class="grid-bg"></div>
-  <div class="glow-orb orb-1"></div>
-  <div class="glow-orb orb-2"></div>
-
-  <!-- ============ LOADING ============ -->
-  <div *ngIf="loading" class="cyber-card loading-card">
-    <div class="loader-ring">
-      <div></div><div></div><div></div><div></div>
+<div class="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-slate-900 selection:text-white">
+  
+  <!-- ============ LOADING STATE ============ -->
+  <div *ngIf="loading" class="flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 p-8 max-w-sm w-full text-center shadow-card animate-fade-in">
+      <div class="w-10 h-10 border-2 border-slate-200 border-t-slate-900 rounded-full animate-spin mx-auto mb-4"></div>
+      <h3 class="font-bold text-slate-900 text-base">Preparing Examination</h3>
+      <p class="text-xs text-slate-500 mt-1">Fetching question papers & initializing timer...</p>
     </div>
-    <p class="loading-text">INITIALIZING EXAM...</p>
   </div>
 
-  <!-- ============ RESULT SCREEN ============ -->
-  <div *ngIf="submitted && !loading" class="cyber-card result-card">
-    <div class="result-glow"></div>
-    <div class="result-icon">🏆</div>
-    <h1 class="result-title">EXAM COMPLETE</h1>
-    <p class="result-sub">{{ studentName }}, your mission is accomplished</p>
-
-    <div class="score-display">
-      <div class="score-ring">
-        <svg viewBox="0 0 120 120">
-          <circle class="ring-bg" cx="60" cy="60" r="54"></circle>
-          <circle class="ring-fill" cx="60" cy="60" r="54"
-                  [style.stroke-dashoffset]="339 - (339 * score / questions.length)">
-          </circle>
-        </svg>
-        <div class="score-text">
-          <span class="score-num">{{ score }}</span>
-          <span class="score-total">/ {{ questions.length }}</span>
-        </div>
+  <!-- ============ NO QUESTIONS STATE ============ -->
+  <div *ngIf="noQuestions && !loading" class="flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 p-8 max-w-md w-full text-center shadow-card animate-fade-in">
+      <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-3">
+        <i class="fas fa-folder-open text-xl"></i>
       </div>
-      <p class="percentage">{{ (score / questions.length) * 100 | number:'1.0-0' }}%</p>
+      <h3 class="font-bold text-slate-900 text-lg">No Questions Available</h3>
+      <p class="text-xs text-slate-500 mt-1 mb-6">This examination subject does not have any active questions in the question bank yet.</p>
+      <a routerLink="/login" 
+         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition">
+        <i class="fas fa-arrow-left text-xs"></i>
+        <span>Return to Portal</span>
+      </a>
     </div>
-
-    <div class="result-stats">
-      <div class="stat">
-        <span class="stat-label">CORRECT</span>
-        <span class="stat-value green">{{ score }}</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">WRONG</span>
-        <span class="stat-value red">{{ questions.length - score }}</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">TOTAL</span>
-        <span class="stat-value cyan">{{ questions.length }}</span>
-      </div>
-    </div>
-
-    <a routerLink="/login" class="cyber-btn">
-      <span>◄ BACK TO HOME</span>
-    </a>
   </div>
 
-  <!-- ============ EXAM SCREEN ============ -->
-  <div *ngIf="!submitted && !loading && questions.length" class="cyber-card exam-card">
-
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div class="terminal-dots">
-        <span class="dot red"></span>
-        <span class="dot yellow"></span>
-        <span class="dot green"></span>
-      </div>
-      <div class="terminal-title">
-        <span class="prompt">$</span> exam.{{ subName || 'subject' }}.js
-      </div>
-      <div class="student-badge">
-        <span class="pulse-dot"></span>
-        {{ studentName }}
-      </div>
-    </div>
-
-    <!-- Progress Section -->
-    <div class="progress-section">
-      <div class="progress-info">
-        <span class="q-counter">
-          <span class="q-current">{{ currentQuestionIndex + 1 }}</span>
-          <span class="q-sep">/</span>
-          <span class="q-total">{{ questions.length }}</span>
-        </span>
-        <span class="timer-badge" [class.danger]="countdown <= 10">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-          {{ countdown }}s
-        </span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill"
-             [style.width.%]="((currentQuestionIndex + 1) / questions.length) * 100">
+  <!-- ============ ACTIVE EXAM INTERFACE ============ -->
+  <div *ngIf="!loading && !noQuestions && !submitted" class="flex-1 flex flex-col">
+    
+    <!-- Minimalist Top Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-subtle">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+        
+        <!-- Left: Subject Info -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
+            <i class="fas fa-book-open"></i>
+          </div>
+          <div>
+            <div class="font-bold text-slate-900 text-sm leading-none">{{ subName || 'Examination' }}</div>
+            <div class="text-[11px] text-slate-400 mt-0.5 font-mono">NBAI Test Engine</div>
+          </div>
         </div>
-        <div class="progress-glow"
+
+        <!-- Center: Countdown Timer -->
+        <div class="flex items-center gap-2">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-semibold tracking-wide transition-all"
+               [ngClass]="countdown <= 10 ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-700'">
+            <i class="fas fa-clock text-[11px]" [ngClass]="countdown <= 10 ? 'text-rose-500' : 'text-slate-400'"></i>
+            <span class="font-mono text-sm font-bold">{{ countdown }}s</span>
+          </div>
+        </div>
+
+        <!-- Right: Candidate Profile -->
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-100/70 px-3 py-1.5 rounded-lg">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>{{ studentName }}</span>
+          </div>
+          <a routerLink="/login" 
+             title="Quit Exam"
+             (click)="$event.preventDefault(); (countdown = 0); submitExam();"
+             class="p-2 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-50 transition text-xs font-medium">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Linear Progress Bar -->
+      <div class="w-full bg-slate-100 h-1">
+        <div class="bg-slate-900 h-1 transition-all duration-300"
              [style.width.%]="((currentQuestionIndex + 1) / questions.length) * 100">
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Question Block -->
-    <div class="question-block" [@fadeSlide]>
-
-      <!-- Code Snippet (optional) -->
-      <div *ngIf="questions[currentQuestionIndex].text &&
-                  questions[currentQuestionIndex].text !== questions[currentQuestionIndex].questionText"
-           class="code-snippet">
-        <div class="code-header">
-          <span class="code-lang">javascript</span>
+    <!-- Main Exam Body -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+      
+      <!-- Question Progress Header -->
+      <div class="flex items-center justify-between text-xs text-slate-500 mb-4 pb-2 border-b border-slate-100">
+        <div class="font-medium">
+          Question <span class="font-bold text-slate-900">{{ currentQuestionIndex + 1 }}</span> of <span class="font-bold text-slate-900">{{ questions.length }}</span>
         </div>
-        <pre><code>{{ questions[currentQuestionIndex].text }}</code></pre>
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium uppercase text-[10px]">
+            {{ questions[currentQuestionIndex].type || 'MCQ' }}
+          </span>
+          <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium uppercase text-[10px]">
+            {{ questions[currentQuestionIndex].difficulty || 'Standard' }}
+          </span>
+        </div>
       </div>
 
-      <!-- Question Title -->
-      <h2 class="question-title">
-        <span class="q-badge">Q{{ currentQuestionIndex + 1 }}</span>
-        {{ questions[currentQuestionIndex].questionText }}
-      </h2>
+      <!-- Question Content Card -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-card flex-1 flex flex-col justify-between">
+        
+        <div class="space-y-6">
+          <!-- Question Title -->
+          <div class="flex items-start gap-3">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-900 text-white font-bold text-xs shrink-0 mt-0.5">
+              {{ currentQuestionIndex + 1 }}
+            </span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+              {{ questions[currentQuestionIndex].questionText }}
+            </h2>
+          </div>
 
-      <!-- Options Grid -->
-      <div class="options-grid">
-        <button
-          *ngFor="let option of questions[currentQuestionIndex].options; let i = index"
-          type="button"
-          class="cyber-option"
-          [class.selected]="questions[currentQuestionIndex].selectedAnswer === option"
-          (click)="selectAnswer(option)">
+          <!-- Code Snippet (if available) -->
+          <div *ngIf="questions[currentQuestionIndex].text && questions[currentQuestionIndex].text !== questions[currentQuestionIndex].questionText" 
+               class="rounded-xl bg-slate-900 text-slate-100 p-4 font-mono text-xs overflow-x-auto border border-slate-800 shadow-inner">
+            <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-800 pb-1 flex items-center justify-between">
+              <span>Code Snippet</span>
+              <span class="text-slate-500">readonly</span>
+            </div>
+            <pre class="leading-relaxed"><code>{{ questions[currentQuestionIndex].text }}</code></pre>
+          </div>
 
-          <span class="option-key">{{ ['A','B','C','D'][i] }}</span>
-          <span class="option-text">{{ option }}</span>
-          <span class="option-check">✓</span>
-          <span class="option-glow"></span>
-        </button>
+          <!-- ============ MCQ OPTIONS ============ -->
+          <div *ngIf="questions[currentQuestionIndex].type === 'MCQ'" class="space-y-3 pt-2">
+            <div *ngFor="let option of questions[currentQuestionIndex].options; let i = index"
+                 (click)="selectOption(option)"
+                 [ngClass]="questions[currentQuestionIndex].selectedAnswer === option ? 'border-slate-900 bg-slate-900 text-white shadow-sm' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/80 text-slate-800 bg-white'"
+                 class="p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between group">
+              
+              <div class="flex items-center gap-3.5">
+                <span [ngClass]="questions[currentQuestionIndex].selectedAnswer === option ? 'bg-white text-slate-900' : 'bg-slate-100 text-slate-700 group-hover:bg-slate-200'"
+                      class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold font-mono transition">
+                  {{ ['A','B','C','D'][i] }}
+                </span>
+                <span class="text-sm font-medium leading-normal">{{ option }}</span>
+              </div>
+
+              <div class="shrink-0 pl-2">
+                <div [ngClass]="questions[currentQuestionIndex].selectedAnswer === option ? 'border-white bg-white text-slate-900' : 'border-slate-300'"
+                     class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition">
+                  <i *ngIf="questions[currentQuestionIndex].selectedAnswer === option" class="fas fa-check text-[10px]"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ TRUE / FALSE ============ -->
+          <div *ngIf="questions[currentQuestionIndex].type === 'True/False'" class="grid grid-cols-2 gap-4 pt-2">
+            <div *ngFor="let val of ['True', 'False']"
+                 (click)="selectOption(val)"
+                 [ngClass]="questions[currentQuestionIndex].selectedAnswer === val ? 'border-slate-900 bg-slate-900 text-white shadow-sm' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-800 bg-white'"
+                 class="p-5 rounded-xl border-2 transition-all cursor-pointer text-center font-bold text-sm">
+              {{ val }}
+            </div>
+          </div>
+
+          <!-- ============ FILL IN THE BLANKS ============ -->
+          <div *ngIf="questions[currentQuestionIndex].type === 'Fill'" class="space-y-4 pt-2">
+            <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/80 text-xs text-amber-800">
+              <i class="fas fa-circle-info mr-1.5"></i>
+              <span>Enter the missing code for each numbered blank detected in the snippet above:</span>
+            </div>
+
+            <div class="space-y-3">
+              <div *ngFor="let blank of questions[currentQuestionIndex].blanks; let i = index" 
+                   class="flex flex-col sm:flex-row sm:items-center gap-2">
+                <label class="w-24 text-xs font-bold text-slate-700">Blank #{{ i + 1 }}:</label>
+                <input type="text"
+                       [value]="(fillSelections[currentQuestionIndex] || [])[i] || ''"
+                       (input)="updateFillAnswer(i, $any($event.target).value)"
+                       placeholder="Enter answer for blank..."
+                       class="flex-1 px-3.5 py-2 rounded-lg border border-slate-200 text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900" />
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ SHORT ANSWER ============ -->
+          <div *ngIf="questions[currentQuestionIndex].type === 'Short'" class="pt-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Your Answer:</label>
+            <input type="text"
+                   [(ngModel)]="questions[currentQuestionIndex].selectedAnswer"
+                   placeholder="Type your response here..."
+                   class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900" />
+          </div>
+
+        </div>
+
+        <!-- Navigation Action Buttons -->
+        <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+          <button (click)="goToPreviousQuestion()"
+                  [disabled]="currentQuestionIndex === 0"
+                  class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition inline-flex items-center gap-2">
+            <i class="fas fa-arrow-left text-[10px]"></i>
+            <span>Previous</span>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <button *ngIf="currentQuestionIndex < questions.length - 1"
+                    (click)="goToNextQuestion()"
+                    class="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition inline-flex items-center gap-2 shadow-sm">
+              <span>Next Question</span>
+              <i class="fas fa-arrow-right text-[10px]"></i>
+            </button>
+
+            <button *ngIf="currentQuestionIndex === questions.length - 1"
+                    (click)="submitExam()"
+                    class="px-6 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition inline-flex items-center gap-2 shadow-sm">
+              <i class="fas fa-circle-check text-xs"></i>
+              <span>Finish & Submit</span>
+            </button>
+          </div>
+        </div>
       </div>
+    </main>
 
-    </div>
-
+    <!-- Bottom Status Bar -->
+    <footer class="bg-white border-t border-slate-200 py-2.5 px-6 text-center text-xs text-slate-400">
+      <span>Auto-advancing on timer expiration &bull; Question {{ currentQuestionIndex + 1 }} / {{ questions.length }}</span>
+    </footer>
   </div>
 
-  <!-- ============ NO QUESTIONS ============ -->
-  <div *ngIf="!submitted && !loading && !questions.length" class="cyber-card empty-card">
-    <div class="empty-icon">⚠️</div>
-    <h2>NO QUESTIONS FOUND</h2>
-    <p>This subject has no questions yet.</p>
-    <a routerLink="/login" class="cyber-btn">
-      <span>◄ GO BACK</span>
-    </a>
+  <!-- ============ RESULT / COMPLETE SCREEN ============ -->
+  <div *ngIf="submitted && !loading" class="flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 max-w-md w-full text-center shadow-card animate-fade-in space-y-6">
+      
+      <!-- Trophy / Status Icon -->
+      <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center shadow-sm"
+           [ngClass]="(score / questions.length) >= 0.5 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'">
+        <i class="fas text-2xl" [ngClass]="(score / questions.length) >= 0.5 ? 'fa-trophy' : 'fa-clipboard-question'"></i>
+      </div>
+
+      <!-- Title -->
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Examination Completed</h1>
+        <p class="text-xs text-slate-500 mt-1">
+          Well done, <span class="font-semibold text-slate-800">{{ studentName }}</span>. Your submission has been securely recorded.
+        </p>
+      </div>
+
+      <!-- Score Display Card -->
+      <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Final Score</span>
+        <div class="text-4xl font-extrabold text-slate-900 tracking-tight">
+          {{ score }} <span class="text-lg font-medium text-slate-400">/ {{ questions.length }}</span>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-xs font-bold"
+             [ngClass]="(score / questions.length) >= 0.5 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'">
+          {{ ((score / questions.length) * 100) | number:'1.0-0' }}% &bull; {{ (score / questions.length) >= 0.5 ? 'Passed' : 'Needs Improvement' }}
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="p-3 rounded-xl bg-white border border-slate-200">
+          <span class="text-[10px] font-medium text-slate-400 uppercase">Correct</span>
+          <div class="text-lg font-bold text-emerald-600 mt-0.5">{{ score }}</div>
+        </div>
+        <div class="p-3 rounded-xl bg-white border border-slate-200">
+          <span class="text-[10px] font-medium text-slate-400 uppercase">Incorrect</span>
+          <div class="text-lg font-bold text-rose-600 mt-0.5">{{ questions.length - score }}</div>
+        </div>
+        <div class="p-3 rounded-xl bg-white border border-slate-200">
+          <span class="text-[10px] font-medium text-slate-400 uppercase">Total</span>
+          <div class="text-lg font-bold text-slate-800 mt-0.5">{{ questions.length }}</div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="pt-2">
+        <a routerLink="/login" 
+           class="w-full py-2.5 px-4 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition inline-flex items-center justify-center gap-2 shadow-sm">
+          <i class="fas fa-arrow-left text-[10px]"></i>
+          <span>Return to Student Portal</span>
+        </a>
+      </div>
+    </div>
   </div>
 
 </div>

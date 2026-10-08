@@ -1,101 +1,216 @@
-<!-- Header -->
-  <header class="bg-primary text-white p-4 flex justify-between items-center">
-    <h1 class="text-xl font-bold flex items-center gap-2">
-      <i class="fas fa-book"></i>Dashboard
-    </h1>
+<div class="space-y-8">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+      <p class="text-sm text-slate-500 mt-1">Overview of examination subjects, schedules, and top performance metrics.</p>
+    </div>
     <div class="flex items-center gap-3">
-      <span class="text-sm">Admin</span>
-      <img src="https://i.pinimg.com/originals/68/e1/e1/68e1e137959d363f172dc3cc50904669.jpg" alt="Profile" class="w-9 h-9 rounded-full object-cover">
+      <a routerLink="/admin/manageexam" 
+         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition shadow-sm">
+        <i class="fas fa-plus text-xs"></i>
+        <span>Manage Exams</span>
+      </a>
+      <a routerLink="/admin/result" 
+         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 hover:text-slate-900 transition shadow-sm">
+        <i class="fas fa-chart-simple text-xs"></i>
+        <span>All Results</span>
+      </a>
     </div>
-  </header>
+  </div>
 
-  <!-- Main Section -->
-  <div class="flex flex-1 flex-col lg:flex-row">
-
-    <!-- Main Content -->
-    <main class="flex-1 p-6">
-
-      <!-- Quick Actions -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <button routerLink="manageexam" class="bg-primary text-white py-3 px-4 rounded-lg shadow hover:bg-opacity-90 flex items-center gap-2">
-          <i class="fas fa-plus-circle"></i> Add Exam
-        </button>
-   
-        <button routerLink="result" class="bg-purple-600 text-white py-3 px-4 rounded-lg shadow hover:bg-purple-700 flex items-center gap-2">
-          <i class="fas fa-chart-bar"></i> Results
-        </button>
+  <!-- Overview Metric Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Stat 1: Total Subjects -->
+    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+      <div>
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Subjects</span>
+        <div class="text-2xl font-bold text-slate-900 mt-1">{{ subjects.length }}</div>
+        <span class="text-xs text-slate-400 mt-1 block">Active courses in system</span>
       </div>
-
-   <section class="mb-10" *ngIf="allSubjects.length > 0">
-  <h2 class="text-xl font-semibold mb-4">Upcoming Computer Science Exams</h2>
-
-  <div *ngIf="subjects.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-  <div *ngFor="let subject of allSubjects" class="relative bg-gray-50 border border-gray-200 rounded-lg p-5 shadow hover:shadow-md transition">
-    <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ subject.subjectName }}</h3>
-    <p class="text-sm text-gray-600 mb-2">Code: {{ subject.subjectCode }}</p>
-
-    <div *ngIf="subject.examDate" class="text-sm text-green-700 space-y-1 mb-2">
-      <div><i class="fas fa-calendar-alt mr-1"></i> {{ subject.examDate }}</div>
-      <div><i class="fas fa-clock mr-1"></i> {{ subject.examTime }}</div>
-      <div><i class="fas fa-hourglass-half mr-1"></i> {{ subject.duration }} mins</div>
+      <div class="w-11 h-11 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700">
+        <i class="fas fa-book-open text-base"></i>
+      </div>
     </div>
 
+    <!-- Stat 2: Scheduled Exams -->
+    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+      <div>
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Scheduled Exams</span>
+        <div class="text-2xl font-bold text-slate-900 mt-1">{{ scheduledExamsCount }}</div>
+        <span class="text-xs text-slate-400 mt-1 block">With exam date & time</span>
+      </div>
+      <div class="w-11 h-11 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+        <i class="fas fa-calendar-check text-base"></i>
+      </div>
+    </div>
+
+    <!-- Stat 3: Total Submissions -->
+    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+      <div>
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Submissions</span>
+        <div class="text-2xl font-bold text-slate-900 mt-1">{{ results.length }}</div>
+        <span class="text-xs text-slate-400 mt-1 block">Completed exams</span>
+      </div>
+      <div class="w-11 h-11 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+        <i class="fas fa-circle-check text-base"></i>
+      </div>
+    </div>
+
+    <!-- Stat 4: Average Score -->
+    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+      <div>
+        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Average Score</span>
+        <div class="text-2xl font-bold text-slate-900 mt-1">{{ averageScore }}%</div>
+        <span class="text-xs text-slate-400 mt-1 block">Across all students</span>
+      </div>
+      <div class="w-11 h-11 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+        <i class="fas fa-trophy text-base"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Scheduled Exams Section -->
+  <div class="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm">
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h2 class="text-base font-semibold text-slate-900">Upcoming & Available Exams</h2>
+        <p class="text-xs text-slate-500 mt-0.5">List of active examination modules</p>
+      </div>
+      <a routerLink="/admin/manageexam" class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition">
+        Manage All &rarr;
+      </a>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="subjects.length === 0" class="text-center py-12 border-2 border-dashed border-slate-200 rounded-lg">
+      <i class="fas fa-folder-open text-3xl text-slate-300 mb-3"></i>
+      <p class="text-sm font-medium text-slate-700">No examination subjects found</p>
+      <p class="text-xs text-slate-400 mt-1 mb-4">Create your first subject to schedule exams.</p>
+      <a routerLink="/admin/manageexam" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 transition">
+        <i class="fas fa-plus text-[10px]"></i>
+        Add Subject
+      </a>
+    </div>
+
+    <!-- Subject Cards Grid -->
+    <div *ngIf="subjects.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngFor="let subject of subjects" 
+           class="p-4 rounded-lg border border-slate-200/80 bg-slate-50/50 hover:bg-white hover:border-slate-300 hover:shadow-sm transition group">
+        <div class="flex items-start justify-between gap-2">
+          <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-200/70 text-slate-700 uppercase tracking-wide">
+            {{ subject.subjectCode || 'CODE' }}
+          </span>
+          <span *ngIf="subject.examDate" class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Scheduled
+          </span>
+        </div>
+
+        <h3 class="font-semibold text-slate-900 text-base mt-2 group-hover:text-indigo-600 transition">
+          {{ subject.subjectName }}
+        </h3>
+
+        <!-- Schedule details if present -->
+        <div *ngIf="subject.examDate" class="mt-3 space-y-1.5 text-xs text-slate-600">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-calendar-days text-slate-400 w-3.5"></i>
+            <span>{{ subject.examDate }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-clock text-slate-400 w-3.5"></i>
+            <span>{{ subject.examTime || 'Time not set' }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-hourglass-half text-slate-400 w-3.5"></i>
+            <span>{{ subject.duration || 60 }} Minutes</span>
+          </div>
+        </div>
+
+        <div *ngIf="!subject.examDate" class="mt-3 text-xs text-slate-400 italic">
+          Schedule not configured yet
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+          <a routerLink="/admin/manageexam" class="text-slate-600 hover:text-slate-900 font-medium">
+            Manage Questions
+          </a>
+          <i class="fas fa-arrow-right text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Scoring Results Section -->
+  <div class="bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm">
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h2 class="text-base font-semibold text-slate-900">Recent High Scorers</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Top performing students from recent submissions</p>
+      </div>
+      <a routerLink="/admin/result" class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition">
+        View Full Table &rarr;
+      </a>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="topResults.length === 0" class="text-center py-10 text-slate-400">
+      <i class="fas fa-user-graduate text-3xl mb-2 text-slate-300"></i>
+      <p class="text-sm font-medium text-slate-600">No examination submissions yet</p>
+      <p class="text-xs text-slate-400 mt-0.5">Results will appear here when students complete their exams.</p>
+    </div>
+
+    <!-- Clean Results Table -->
+    <div *ngIf="topResults.length > 0" class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-xs font-medium text-slate-500 uppercase tracking-wider">
+            <th class="pb-3 font-semibold">Rank</th>
+            <th class="pb-3 font-semibold">Student Name</th>
+            <th class="pb-3 font-semibold">Subject</th>
+            <th class="pb-3 font-semibold">Score</th>
+            <th class="pb-3 font-semibold">Percentage</th>
+            <th class="pb-3 font-semibold">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let res of topResults; let i = index" class="hover:bg-slate-50/70 transition">
+            <td class="py-3.5 text-xs font-medium text-slate-400">
+              <span class="inline-flex items-center justify-center w-5 h-5 rounded-full"
+                    [ngClass]="i === 0 ? 'bg-amber-100 text-amber-700 font-bold' : (i === 1 ? 'bg-slate-200 text-slate-700 font-bold' : 'bg-slate-100 text-slate-500')">
+                {{ i + 1 }}
+              </span>
+            </td>
+            <td class="py-3.5 font-medium text-slate-900">
+              {{ res.studentName }}
+            </td>
+            <td class="py-3.5 text-slate-600 text-xs">
+              {{ res.subName || getSubjectName(res.subjectId) }}
+            </td>
+            <td class="py-3.5 text-slate-800 font-semibold font-mono text-xs">
+              {{ res.score }} / {{ res.total || 10 }}
+            </td>
+            <td class="py-3.5">
+              <div class="flex items-center gap-2">
+                <div class="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-indigo-600 h-full rounded-full" 
+                       [style.width.%]="((res.score || 0) / (res.total || 10)) * 100">
+                  </div>
+                </div>
+                <span class="text-xs font-medium text-slate-600">
+                  {{ (((res.score || 0) / (res.total || 10)) * 100) | number:'1.0-0' }}%
+                </span>
+              </div>
+            </td>
+            <td class="py-3.5">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                    [ngClass]="((res.score || 0) / (res.total || 10)) >= 0.5 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'">
+                {{ ((res.score || 0) / (res.total || 10)) >= 0.5 ? 'Passed' : 'Failed' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
-
-</section>
-
-<!-- Optional fallback if no exams -->
-<section *ngIf="allSubjects.length === 0" class="text-center text-gray-500 py-10">
-  <i class="fas fa-calendar-times text-5xl mb-3 text-gray-400"></i>
-  <p class="text-lg">No upcoming exams scheduled.</p>
-</section>
-
-
-
-   <section class="mb-10">
-  <h2 class="text-xl font-semibold mb-4">Top Scoring Results</h2>
-
-  <!-- 🛑 No Results Available -->
-  <div *ngIf="topResults.length === 0" class="text-center text-gray-500 py-10">
-    <div class="text-5xl mb-4 text-yellow-400">
-      <i class="fas fa-user-graduate"></i>
-    </div>
-    <p class="text-lg font-medium mb-2">No results found</p>
-    <p class="text-sm">Results will appear here once students complete their exams.</p>
-  </div>
-
-  <!-- ✅ Results Table -->
-  <div *ngIf="topResults.length > 0" class="overflow-x-auto bg-white border border-gray-200 rounded shadow">
-    <table class="min-w-full text-sm text-left">
-      <thead class="border-b bg-gray-100">
-        <tr>
-          <th class="p-2">#</th>
-          <th class="p-2">Student</th>
-          <th class="p-2">Exam</th>
-          <th class="p-2">Score</th>
-          <th class="p-2">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let result of topResults; let i = index" class="border-b">
-          <td class="p-2">{{ i + 1 }}</td>
-          <td class="p-2">{{ result.studentName }}</td>
-          <td class="p-2">{{ result.examName || 'N/A' }}</td>
-          <td class="p-2">{{ result.score }} / {{ result.total || 100 }}</td>
-          <td class="p-2" [ngClass]="{
-            'text-green-600': result.status === 'Pass',
-            'text-red-600': result.status === 'Fail'
-          }">
-            {{ result.status || 'N/A' }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-
-    </main>
-
-  </div>

@@ -8,7 +8,11 @@ import { Component } from '@angular/core';
 export class NavAdminComponent {
   sidebarOpen = false;
 
-  toggleSidebar() {
+  toggleSidebar(): void {
     this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen = false;
   }
 }

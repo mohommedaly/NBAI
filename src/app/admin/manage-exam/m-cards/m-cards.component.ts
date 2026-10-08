@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { ApiService } from '../../../api.service';
+import { ApiService, Subject } from '../../../api.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-m-cards',
@@ -9,11 +9,9 @@ import { forkJoin, of } from 'rxjs';
   styleUrls: ['./m-cards.component.scss']
 })
 export class MCardsComponent implements OnInit {
-
   subjects: any[] = [];
   @Output() subjectSelected = new EventEmitter<any>();
 
-  showDeleteIcons = false;
   showConfirmDialog = false;
   subjectToDelete: any = null;
 
@@ -21,40 +19,33 @@ export class MCardsComponent implements OnInit {
   subjectForm: FormGroup;
 
   // Schedule modal state
-  selectedSubject: any = null;
+  selectedSubjectForSchedule: any = null;
   showScheduleModal = false;
   examDate = '';
   examTime = '';
   examDuration = 60;
+  isSubmitting = false;
 
   constructor(private fb: FormBuilder, private api: ApiService) {
     this.subjectForm = this.fb.group({
-      subjectName: ['', Validators.required],
-      subjectCode: ['', Validators.required],
+      subjectName: ['', [Validators.required, Validators.minLength(2)]],
+      subjectCode: ['', [Validators.required, Validators.minLength(2)]],
     });
   }
 
   ngOnInit(): void {
     this.fetchSubjects();
   }
- selectSubject(subject: any) {
-    this.selectedSubject = subject;  // Assign the selected subject to the variable
-  }
+
   fetchSubjects(): void {
-    this.api.getSubjects().subscribe(
-      data => this.subjects = data,
-      error => console.error('Error fetching subjects:', error)
-    );
+    this.api.getSubjects().subscribe({
+      next: data => this.subjects = data || [],
+      error: error => console.error('Error fetching subjects:', error)
+    });
   }
 
-  onSubjectClick(subject: any): void {
-    if (!this.showDeleteIcons) {
-      this.subjectSelected.emit(subject);
-    }
-  }
-
-  toggleDeleteIcons(): void {
-    this.showDeleteIcons = !this.showDeleteIcons;
+  onManageQuestions(subject: any): void {
+    this.subjectSelected.emit(subject);
   }
 
   openConfirmDialog(subject: any): void {
@@ -66,69 +57,50 @@ export class MCardsComponent implements OnInit {
     this.subjectToDelete = null;
     this.showConfirmDialog = false;
   }
-confirmDelete(): void {
-  if (!this.subjectToDelete) return;
 
-  const subjectId = this.subjectToDelete.id;
-  if (!subjectId) {
-    console.error('Subject ID is null or undefined. Cannot proceed.');
-    return;
+  confirmDelete(): void {
+    if (!this.subjectToDelete?.id) return;
+
+    const subjectId = this.subjectToDelete.id;
+    this.isSubmitting = true;
+
+    this.api.getQuestionsBySubject(subjectId).subscribe({
+      next: (questions: any[]) => {
+        const validQuestions = (questions || []).filter((q: any) => q.id);
+        const deleteRequests = validQuestions.map((q: any) => this.api.deleteQuestion(q.id));
+
+        if (deleteRequests.length > 0) {
+          forkJoin(deleteRequests).subscribe({
+            next: () => this.executeDeleteSubject(subjectId),
+            error: () => this.executeDeleteSubject(subjectId)
+          });
+        } else {
+          this.executeDeleteSubject(subjectId);
+        }
+      },
+      error: () => {
+        this.executeDeleteSubject(subjectId);
+      }
+    });
   }
 
-  this.api.getQuestionsBySubject(subjectId).subscribe({
-    next: questions => {
-      const validQuestions = questions.filter((q: any) => q.id);
-      if (validQuestions.length < questions.length) {
-        console.warn('Some questions have invalid or missing IDs and will not be deleted.');
-      }
-
-      const deleteRequests = validQuestions.map((q: any) => this.api.deleteQuestion(q.id));
-
-      if (deleteRequests.length > 0) {
-        forkJoin(deleteRequests).subscribe({
-          next: () => this.deleteSubject(subjectId),
-          error: err => {
-            console.error('Failed to delete related questions:', err);
-            this.cancelDelete();
-          }
-        });
-      } else {
-        this.deleteSubject(subjectId);
-      }
-    },
-    error: err => {
-      console.error('Error fetching questions to delete:', err);
-      this.cancelDelete();
-    }
-  });
-}
-
-
-deleteSubject(subjectId: any): void {
-  this.api.deleteSubject(subjectId).subscribe({
-    next: () => {
-      this.subjects = this.subjects.filter(s => s.id !== subjectId);
-      this.cancelDelete();
-    },
-    error: err => {
-      console.error('Failed to delete subject:', err);
-      this.cancelDelete();
-    }
-  });
-}
-
-  deleteQuestionsForSubject(subjectId: string): void {
-    this.api.getQuestionsBySubject(subjectId).subscribe({
-      next: questions => {
-        questions.forEach((question: any) => {
-          this.api.deleteQuestion(question.id).subscribe();
-        });
+  private executeDeleteSubject(subjectId: string): void {
+    this.api.deleteSubject(subjectId).subscribe({
+      next: () => {
+        this.subjects = this.subjects.filter(s => s.id !== subjectId);
+        this.isSubmitting = false;
+        this.cancelDelete();
       },
-      error: err => console.error('Error fetching questions to delete:', err)
+      error: err => {
+        console.error('Failed to delete subject:', err);
+        this.isSubmitting = false;
+        this.cancelDelete();
+      }
     });
   }
 
   openForm(): void {
+    this.subjectForm.reset();
     this.showForm = true;
   }
 
@@ -139,21 +111,26 @@ deleteSubject(subjectId: any): void {
 
   submitForm(): void {
     if (this.subjectForm.valid) {
+      this.isSubmitting = true;
       const newSubject = this.subjectForm.value;
 
       this.api.addSubject(newSubject).subscribe({
         next: (response) => {
-          this.subjects.push(response);
+          this.subjects.push(response || newSubject);
+          this.isSubmitting = false;
           this.closeForm();
+          this.fetchSubjects();
         },
-        error: err => console.error('Error adding subject:', err)
+        error: err => {
+          console.error('Error adding subject:', err);
+          this.isSubmitting = false;
+        }
       });
     }
   }
 
-  // 🟢 Schedule Modal Logic
   openScheduleModal(subject: any): void {
-    this.selectedSubject = subject;
+    this.selectedSubjectForSchedule = subject;
     this.examDate = subject.examDate || '';
     this.examTime = subject.examTime || '';
     this.examDuration = subject.duration || 60;
@@ -162,17 +139,18 @@ deleteSubject(subjectId: any): void {
 
   closeScheduleModal(): void {
     this.showScheduleModal = false;
-    this.selectedSubject = null;
+    this.selectedSubjectForSchedule = null;
     this.examDate = '';
     this.examTime = '';
     this.examDuration = 60;
   }
 
   saveSchedule(): void {
-    if (!this.selectedSubject) return;
+    if (!this.selectedSubjectForSchedule) return;
 
+    this.isSubmitting = true;
     const updatedSubject = {
-      ...this.selectedSubject,
+      ...this.selectedSubjectForSchedule,
       examDate: this.examDate,
       examTime: this.examTime,
       duration: this.examDuration
@@ -181,9 +159,13 @@ deleteSubject(subjectId: any): void {
     this.api.updateSubject(updatedSubject.id, updatedSubject).subscribe({
       next: () => {
         this.subjects = this.subjects.map(s => s.id === updatedSubject.id ? updatedSubject : s);
+        this.isSubmitting = false;
         this.closeScheduleModal();
       },
-      error: err => console.error('Failed to update subject schedule:', err)
+      error: err => {
+        console.error('Failed to update subject schedule:', err);
+        this.isSubmitting = false;
+      }
     });
   }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../../../api.service';  // Update path as necessary
+import { ApiService, Subject, Result } from '../../../api.service';
 
 @Component({
   selector: 'app-cards-dashboard',
@@ -7,49 +7,63 @@ import { ApiService } from '../../../api.service';  // Update path as necessary
   styleUrls: ['./cards-dashboard.component.scss']
 })
 export class CardsDashboardComponent implements OnInit {
-
   subjects: any[] = [];
   results: any[] = [];
+  loading = true;
 
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
-    // Fetch subjects on component init
-    this.fetchSubjects();
-
-    // Fetch results (example, can be removed or adjusted as needed)
-    this.api.getAllResults().subscribe({
-      next: data => {
-        this.results = data.sort((a, b) => b.score - a.score); // highest first
-      },
-      error: err => console.error('Failed to fetch results:', err)
-    });
+    this.fetchData();
   }
 
-  fetchSubjects(): void {
+  fetchData(): void {
+    this.loading = true;
     this.api.getSubjects().subscribe({
-      next: data => {
-        this.subjects = data;
-        console.log('Fetched subjects:', this.subjects);  // Debugging line to check the subjects
+      next: (data) => {
+        this.subjects = data || [];
+        this.loadResults();
       },
-      error: err => {
+      error: (err) => {
         console.error('Error fetching subjects:', err);
+        this.loadResults();
       }
     });
   }
 
-  get allSubjects(): any[] {
-    return this.subjects;
-  }
-
-  formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(undefined, {
-      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+  loadResults(): void {
+    this.api.getAllResults().subscribe({
+      next: (data) => {
+        this.results = (data || []).sort((a: any, b: any) => (b.score || 0) - (a.score || 0));
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Failed to fetch results:', err);
+        this.loading = false;
+      }
     });
   }
 
-  get topResults() {
-    return this.results.slice(0, 5); // Show top 5 results
+  get scheduledExamsCount(): number {
+    return this.subjects.filter(s => s.examDate).length;
+  }
+
+  get topResults(): any[] {
+    return this.results.slice(0, 6);
+  }
+
+  get averageScore(): number {
+    if (!this.results.length) return 0;
+    const totalPercentage = this.results.reduce((acc, r) => {
+      const total = r.total || 10;
+      return acc + ((r.score || 0) / total) * 100;
+    }, 0);
+    return Math.round(totalPercentage / this.results.length);
+  }
+
+  getSubjectName(subjectId: string): string {
+    if (!subjectId) return 'General';
+    const sub = this.subjects.find(s => s.id === subjectId);
+    return sub ? sub.subjectName : 'General';
   }
 }

@@ -6,12 +6,13 @@ import { Component } from '@angular/core';
   styleUrl: './manage-exam.component.scss'
 })
 export class ManageExamComponent {
-  selectedSubject: any;
+  selectedSubject: any = null;
 
-  // This method is triggered when a subject is selected in MCardsComponent
   onSubjectSelected(subject: any): void {
-    console.log('Selected Subject:', subject);
-    this.selectedSubject = subject;  // Store the selected subject
+    this.selectedSubject = subject;
   }
 
+  clearSelectedSubject(): void {
+    this.selectedSubject = null;
+  }
 }
